@@ -634,7 +634,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v12_excel';
+  const marker = 'me_seed_v13_excel_fix';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -1078,8 +1078,8 @@ function exportExcel() {
 
   const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Min','Max','Status'];
   
-  // Format XML untuk Excel
-  const xml = `<?xml version="1.0"?>
+  // Gunakan let karena akan ditambahkan string di dalam loop
+  let xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:o="urn:schemas-microsoft-com:office:office"
