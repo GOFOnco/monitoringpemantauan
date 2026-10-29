@@ -14,76 +14,191 @@
   }
   .hidden { display: none !important; }
 
-  /* LOGIN */
+  /* ================= LOGIN PAGE (UPGRADED) ================= */
   #loginPage {
     display: flex; align-items: center; justify-content: center;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(37,99,235,.35), transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(6,182,212,.3), transparent 50%),
-      linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-    padding: 20px; position: relative; overflow: hidden;
+    background: #0f172a;
+    position: relative; overflow: hidden;
+    padding: 20px;
   }
+
+  /* Aurora blobs */
+  .aurora {
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+    animation: float 20s infinite alternate ease-in-out;
+    z-index: 0;
+  }
+  .aurora-1 {
+    width: 500px; height: 500px; background: #2563eb;
+    top: -150px; left: -100px;
+  }
+  .aurora-2 {
+    width: 400px; height: 400px; background: #06b6d4;
+    bottom: -100px; right: -50px;
+    animation-delay: -5s; animation-duration: 25s;
+  }
+  .aurora-3 {
+    width: 300px; height: 300px; background: #a855f7;
+    top: 40%; left: 60%;
+    animation-delay: -10s; animation-duration: 30s;
+  }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(50px, 30px) scale(1.1); }
+    100% { transform: translate(-30px, -20px) scale(0.9); }
+  }
+
+  /* Grid overlay */
   #loginPage::before {
     content: ''; position: absolute; inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-    background-size: 40px 40px; pointer-events: none;
+      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+    z-index: 1; pointer-events: none;
   }
+
+  /* Particles container */
+  #particles {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  }
+  .particle {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    background: rgba(255,255,255,.7);
+    box-shadow: 0 0 10px 2px rgba(59,130,246,.6);
+    animation: particleFloat 15s infinite linear;
+  }
+  @keyframes particleFloat {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* Login Box */
   .login-box {
-    background: rgba(255,255,255,.98);
-    padding: 44px 38px; border-radius: 20px; width: 400px;
-    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05);
-    position: relative; z-index: 1;
-    animation: loginIn .5s cubic-bezier(.16,1,.3,1);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 48px 42px;
+    border-radius: 24px;
+    width: 420px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05) inset;
+    position: relative; z-index: 2;
+    animation: slideUp 0.7s cubic-bezier(.16,1,.3,1);
   }
-  @keyframes loginIn {
-    from { transform: translateY(20px) scale(.98); opacity: 0; }
+  @keyframes slideUp {
+    from { transform: translateY(40px) scale(.95); opacity: 0; }
     to { transform: translateY(0) scale(1); opacity: 1; }
   }
+
   .login-logo {
-    width: 56px; height: 56px; border-radius: 14px;
-    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    width: 72px; height: 72px; border-radius: 20px;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
     display: flex; align-items: center; justify-content: center;
-    font-size: 28px; margin-bottom: 18px;
-    box-shadow: 0 8px 24px rgba(37,99,235,.4);
+    font-size: 36px; margin-bottom: 24px;
+    box-shadow: 0 8px 30px rgba(59,130,246,.5);
+    animation: pulse 2.5s infinite;
+    position: relative;
   }
-  .login-box h1 { font-size: 24px; margin-bottom: 6px; color: #0f172a; font-weight: 800; letter-spacing: -.5px; }
-  .login-box p { font-size: 13.5px; color: #64748b; margin-bottom: 26px; }
-  .login-box label { font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 7px; color: #334155; text-transform: uppercase; letter-spacing: .4px; }
-  .login-box input {
-    width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: 16px; margin-bottom: 14px; text-transform: uppercase;
-    font-family: inherit; font-weight: 600; letter-spacing: 1px;
-    transition: border-color .15s, box-shadow .15s;
+  .login-logo::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 24px;
+    border: 2px solid rgba(59,130,246,.4);
+    animation: ripple 2.5s infinite;
   }
-  .login-box input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
-  .login-box button.main-btn {
-    width: 100%; padding: 14px; border: none; border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff;
-    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
-    transition: transform .12s, box-shadow .2s;
-    box-shadow: 0 8px 20px rgba(37,99,235,.35);
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 8px 30px rgba(59,130,246,.5); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 40px rgba(59,130,246,.8); }
   }
-  .login-box button.main-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(37,99,235,.45); }
-  .login-box button.main-btn:active { transform: translateY(0); }
-  .err { color: #dc2626; font-size: 13px; margin-bottom: 12px; min-height: 16px; font-weight: 600; }
+  @keyframes ripple {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .login-box h1 {
+    font-size: 28px; margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff, #93c5fd);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800; letter-spacing: -1px;
+  }
+  .login-box p { font-size: 14px; color: #94a3b8; margin-bottom: 32px; }
+  
+  .input-group { position: relative; margin-bottom: 20px; }
+  .input-group label {
+    position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; color: #94a3b8; font-weight: 600;
+    pointer-events: none; transition: all 0.2s ease;
+    background: transparent; padding: 0 4px;
+  }
+  .input-group input {
+    width: 100%; padding: 16px 18px;
+    background: rgba(255,255,255,.03);
+    border: 2px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    font-size: 16px; color: #fff;
+    font-family: inherit; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+  .input-group input:focus {
+    outline: none; border-color: #3b82f6;
+    background: rgba(59,130,246,.1);
+    box-shadow: 0 0 0 4px rgba(59,130,246,.2), 0 0 20px rgba(59,130,246,.3);
+  }
+  /* Label animation ketika input focus atau ada isinya */
+  .input-group input:focus + label,
+  .input-group input:not(:placeholder-shown) + label {
+    top: 0; left: 14px;
+    font-size: 11px; color: #60a5fa;
+    background: #0f172a; padding: 0 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  .err { color: #f87171; font-size: 13px; margin-bottom: 12px; min-height: 18px; font-weight: 600; }
+  
+  .btn-main {
+    width: 100%; padding: 16px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    position: relative; overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(37,99,235,.4);
+    margin-top: 10px;
+  }
+  .btn-main::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(37,99,235,.6); }
+  .btn-main:hover::before { left: 100%; }
+  .btn-main:active { transform: translateY(0); }
+
   .hint {
-    margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;
-    font-size: 12px; color: #64748b; line-height: 1.8;
+    margin-top: 28px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    font-size: 12.5px; color: #64748b; line-height: 1.8;
   }
-  .hint b { color: #334155; }
+  .hint b { color: #cbd5e1; }
   .hint code {
-    background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 2px 8px; border-radius: 5px;
-    color: #1e40af; font-weight: 700; font-family: 'Courier New', monospace;
+    background: rgba(59,130,246,.15); padding: 3px 8px; border-radius: 6px;
+    color: #93c5fd; font-weight: 700; font-family: 'Courier New', monospace;
+    border: 1px solid rgba(59,130,246,.2);
   }
-  .hint button {
-    margin-top: 10px; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;
-    padding: 7px 14px; border-radius: 7px; font-size: 12px; cursor: pointer;
-    font-family: inherit; font-weight: 600;
+  .btn-reset {
+    margin-top: 12px; background: rgba(255,255,255,.05); color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,.1); padding: 8px 16px;
+    border-radius: 8px; font-size: 12px; cursor: pointer;
+    font-family: inherit; font-weight: 600; transition: all 0.2s;
   }
-  .hint button:hover { background: #e2e8f0; }
+  .btn-reset:hover { background: rgba(255,255,255,.1); color: #fff; }
 
   /* APP SHELL */
   header.topbar {
@@ -462,26 +577,34 @@
 </head>
 <body>
 
+<!-- ================= LOGIN PAGE BARU ================= -->
 <div id="loginPage">
+  <div class="aurora aurora-1"></div>
+  <div class="aurora aurora-2"></div>
+  <div class="aurora aurora-3"></div>
+  <div id="particles"></div>
+
   <div class="login-box">
     <div class="login-logo">🌡️</div>
     <h1>Monitoring Environment</h1>
     <p>Sistem pemantauan parameter ruangan per shift</p>
-    <label>NIK</label>
-    <input id="loginNik" placeholder="Masukkan NIK" autocomplete="off">
+    
+    <div class="input-group">
+      <input id="loginNik" placeholder=" " autocomplete="off">
+      <label for="loginNik">NIK</label>
+    </div>
+    
     <div class="err" id="loginErr"></div>
-    <button class="main-btn" onclick="doLogin()">Login</button>
+    
+    <button class="btn-main" onclick="doLogin()">Masuk ke Sistem</button>
+    
     <div class="hint">
       <b>NIK default untuk coba:</b><br>
       • <code>1001</code> — QC<br>
       • <code>1002</code> — LOGISTIC<br>
       • <code>1003</code> — PRODUKSI<br>
       • <code>1004</code> — QA (super admin)<br>
-      <button onclick="resetAll()">Reset Data</button>
-      <div style="margin-top:10px;font-size:11px;color:#94a3b8">
-        Mode sandbox: data tersimpan di memori (hilang saat refresh).<br>
-        Data dummy 1 bulan penuh sudah terisi otomatis.
-      </div>
+      <button class="btn-reset" onclick="resetAll()">Reset Data (Mode Demo)</button>
     </div>
   </div>
 </div>
@@ -522,6 +645,26 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ================= GENERATE PARTICLES ================= */
+(function generateParticles() {
+  const container = document.getElementById('particles');
+  if (!container) return;
+  const count = 30;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 15 + 's';
+    p.style.animationDuration = (10 + Math.random() * 15) + 's';
+    // Variasikan warna berdasarkan index
+    if (i % 3 === 0) p.style.background = 'rgba(6, 182, 212, 0.8)'; // Cyan
+    else if (i % 3 === 1) p.style.background = 'rgba(168, 85, 247, 0.8)'; // Purple
+    p.style.width = (Math.random() * 3 + 2) + 'px';
+    p.style.height = p.style.width;
+    container.appendChild(p);
+  }
+})();
+
 /* ================= STORAGE ================= */
 const LS = { users:'me_users', rooms:'me_rooms', params:'me_params', records:'me_records', session:'me_session', seq:'me_seq' };
 const memStore = {};
@@ -634,7 +777,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v13_excel_fix';
+  const marker = 'me_seed_v14_anim_login';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -1078,7 +1221,6 @@ function exportExcel() {
 
   const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Min','Max','Status'];
   
-  // Gunakan let karena akan ditambahkan string di dalam loop
   let xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
@@ -1103,13 +1245,11 @@ function exportExcel() {
   <Table>
    <Row>`;
   
-  // Header row
   header.forEach(h => {
     xml += `<Cell ss:StyleID="header"><Data ss:Type="String">${esc(h)}</Data></Cell>`;
   });
   xml += `</Row>`;
 
-  // Data rows
   recs.slice().sort((a, b) => a.no - b.no).forEach(r => {
     const d = parseWaktu(r.waktu);
     const tgl = d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
