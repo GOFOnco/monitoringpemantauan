@@ -809,7 +809,7 @@ function renderDashboard() {
       }
       if (param) {
         if (param.id !== prevParamId) {
-          html += `<td class="param-c" rowspan="${SHIFTS.length}">${esc(param.nama)}<small>${esc(param.satuan)} · ${esc(param.min)}–${esc(param.max)}</small></td>`;
+          html += `<td class="param-c" rowspan="${SHIFTS.length}">${esc(param.nama)}<small>${esc(param.min)}–${esc(param.max)} ${esc(param.satuan)}</small></td>`;
           prevParamId = param.id;
         }
         html += `<td class="shift-c">${esc(shift)}</td>`;
