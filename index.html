@@ -164,6 +164,11 @@
   .btn-edit:hover { background: #fde68a; }
   .btn-secondary { background: #e2e8f0; color: #334155; }
   .btn-secondary:hover { background: #cbd5e1; }
+  .btn-export {
+    background: linear-gradient(135deg, #16a34a, #15803d); color: #fff;
+    box-shadow: 0 4px 12px rgba(22,163,74,.3);
+  }
+  .btn-export:hover { box-shadow: 0 6px 18px rgba(22,163,74,.4); }
   .btn-sm { padding: 6px 11px; font-size: 12px; }
   .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
   .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
@@ -322,6 +327,36 @@
   .matrix-legend .dot.ok { background: #dcfce7; border: 1px solid #86efac; }
   .matrix-legend .dot.empty { background: #f8fafc; border: 1px solid #e2e8f0; }
 
+  /* Chart */
+  .chart-section { margin-top: 22px; }
+  .chart-title {
+    font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chart-sub { font-size: 11.5px; color: #94a3b8; font-weight: 600; margin-bottom: 14px; }
+  .chart-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+  }
+  .chart-card {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 14px 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.03);
+  }
+  .chart-card .head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 10px; gap: 10px;
+  }
+  .chart-card .head .left { min-width: 0; }
+  .chart-card .head .pname { font-weight: 800; font-size: 13px; color: #0f172a; }
+  .chart-card .head .proom { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
+  .chart-card .head .std {
+    font-size: 10.5px; font-weight: 700; color: #1e40af;
+    background: #dbeafe; border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+  }
+  .chart-card .head .std.ng { background: #fee2e2; color: #b91c1c; }
+  .chart-card svg { display: block; width: 100%; height: auto; }
+
   /* Modal */
   .modal-overlay {
     position: fixed; inset: 0;
@@ -444,7 +479,8 @@
       • <code>1004</code> — QA (super admin)<br>
       <button onclick="resetAll()">Reset Data</button>
       <div style="margin-top:10px;font-size:11px;color:#94a3b8">
-        Mode sandbox: data tersimpan di memori (hilang saat refresh).
+        Mode sandbox: data tersimpan di memori (hilang saat refresh).<br>
+        Data dummy 1 bulan penuh sudah terisi otomatis.
       </div>
     </div>
   </div>
@@ -506,6 +542,8 @@ const SHIFT_COUNT = SHIFTS.length;
 const DEPARTMENTS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
 const AREAS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
 
+const CHART_COLORS = ['#2563eb', '#06b6d4', '#16a34a', '#a855f7', '#f59e0b', '#ef4444', '#ec4899', '#0ea5e9'];
+
 const isSuperAdmin = user => user && upper(user.dept) === 'QA';
 
 const todayKey = () => {
@@ -521,29 +559,119 @@ const parseWaktu = str => {
   } catch { return null; }
 };
 
+/* ================= DUMMY DATA GENERATOR ================= */
+function rnd(min, max) { return Math.random() * (max - min) + min; }
+function rndInt(min, max) { return Math.floor(rnd(min, max + 1)); }
+function pick(arr) { return arr[rndInt(0, arr.length - 1)]; }
+
+function generateDummyRecords(rooms, params, users) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  // petugas per area
+  const petugasByArea = {};
+  users.forEach(u => {
+    const d = upper(u.dept);
+    if (d === 'QA') return; // QA tidak input
+    if (!petugasByArea[d]) petugasByArea[d] = [];
+    petugasByArea[d].push(u);
+  });
+
+  const recs = [];
+  let no = 1;
+
+  rooms.forEach(room => {
+    const rParams = params.filter(p => p.roomId === room.id);
+    if (!rParams.length) return;
+
+    const petugasArr = petugasByArea[upper(room.area)] || users.filter(u => upper(u.dept) !== 'QA');
+    const petugas = petugasArr.length ? petugasArr[0] : users[0];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      // skip sebagian hari secara acak untuk variasi (tapi mayoritas diisi)
+      SHIFTS.forEach((sh, si) => {
+        // ~92% slot terisi, sisanya kosong
+        if (Math.random() < 0.08) return;
+
+        const values = [];
+        let anyNg = false;
+
+        rParams.forEach(p => {
+          const minV = Number(p.min), maxV = Number(p.max);
+          const range = maxV - minV;
+          // 85% dalam standar, 15% NG
+          let num;
+          if (Math.random() < 0.15) {
+            // keluar standar
+            if (Math.random() < 0.5) num = minV - range * rnd(0.02, 0.15);
+            else num = maxV + range * rnd(0.02, 0.15);
+          } else {
+            num = minV + range * rnd(0.1, 0.9);
+          }
+
+          // pembulatan sesuai besaran
+          if (range >= 1000) num = Math.round(num);
+          else if (range >= 100) num = Math.round(num * 10) / 10;
+          else num = Math.round(num * 10) / 10;
+
+          const ok = num >= minV && num <= maxV;
+          if (!ok) anyNg = true;
+          values.push({ nama: p.nama, satuan: p.satuan, min: p.min, max: p.max, value: num, ok });
+        });
+
+        const hh = si === 0 ? rndInt(6, 9) : si === 1 ? rndInt(14, 16) : rndInt(21, 23);
+        const mm = rndInt(0, 59);
+        const ss = rndInt(0, 59);
+        const waktu = `${String(d).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}, ${String(hh).padStart(2,'0')}.${String(mm).padStart(2,'0')}.${String(ss).padStart(2,'0')}`;
+
+        recs.push({
+          id: genId(),
+          no: no++,
+          waktu,
+          shift: sh,
+          roomId: room.id,
+          roomNomor: room.nomor,
+          area: room.area,
+          nik: petugas.nik,
+          inisial: petugas.inisial,
+          dept: petugas.dept,
+          values,
+          status: anyNg ? 'NG' : 'OK'
+        });
+      });
+    }
+  });
+
+  return { records: recs, nextNo: no };
+}
+
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v8_qa';
+  const marker = 'me_seed_v11_dummy';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
-  save(LS.users, [
+  const users = [
     { id: genId(), nik: '1001', inisial: 'ADM', dept: 'QC' },
     { id: genId(), nik: '1002', inisial: 'LOG', dept: 'LOGISTIC' },
     { id: genId(), nik: '1003', inisial: 'PRD', dept: 'PRODUKSI' },
     { id: genId(), nik: '1004', inisial: 'QA',  dept: 'QA' }
-  ]);
+  ];
+  save(LS.users, users);
 
   const roomQC1 = genId(), roomQC2 = genId(), roomLOG = genId(), roomPRD1 = genId(), roomPRD2 = genId();
-  save(LS.rooms, [
+  const rooms = [
     { id: roomQC1, nomor: 'R-101', area: 'QC' },
     { id: roomQC2, nomor: 'R-102', area: 'QC' },
     { id: roomLOG, nomor: 'R-201', area: 'LOGISTIC' },
     { id: roomPRD1, nomor: 'R-301', area: 'PRODUKSI' },
     { id: roomPRD2, nomor: 'R-302', area: 'PRODUKSI' }
-  ]);
+  ];
+  save(LS.rooms, rooms);
 
-  save(LS.params, [
+  const params = [
     { id: genId(), roomId: roomQC1, nama: 'SUHU', satuan: '°C', min: 18, max: 26 },
     { id: genId(), roomId: roomQC1, nama: 'KELEMBAPAN', satuan: '%', min: 40, max: 60 },
     { id: genId(), roomId: roomQC2, nama: 'SUHU', satuan: '°C', min: 20, max: 25 },
@@ -552,16 +680,20 @@ function seed(force) {
     { id: genId(), roomId: roomPRD1, nama: 'SUHU', satuan: '°C', min: 20, max: 28 },
     { id: genId(), roomId: roomPRD1, nama: 'TEKANAN UDARA', satuan: 'PA', min: 100000, max: 102000 },
     { id: genId(), roomId: roomPRD2, nama: 'SUHU', satuan: '°C', min: 22, max: 30 }
-  ]);
+  ];
+  save(LS.params, params);
 
-  save(LS.records, []);
-  save(LS.seq, { no: 1 });
+  // generate dummy records untuk bulan berjalan
+  const { records, nextNo } = generateDummyRecords(rooms, params, users);
+  save(LS.records, records);
+  save(LS.seq, { no: nextNo });
   storage.setItem(marker, '1');
+  console.log(`Seed dummy: ${records.length} records, ${nextNo - 1} pemantauan`);
 }
 seed(false);
 
 function resetAll() {
-  showConfirm('Reset Data', 'Hapus semua data dan reset ke default?', () => {
+  showConfirm('Reset Data', 'Hapus semua data dan reset ke default (dengan dummy baru)?', () => {
     storage.clear(); seed(true); location.reload();
   });
 }
@@ -656,7 +788,6 @@ function enterApp() {
   deptBadge.textContent = session.dept;
   deptBadge.className = 'badge' + (isSuperAdmin(session) ? ' super' : '');
 
-  // Tampilkan/sembunyikan tab Management
   const mgmtBtn = document.getElementById('tabBtnManagement');
   mgmtBtn.classList.toggle('hidden', !isSuperAdmin(session));
 
@@ -665,7 +796,6 @@ function enterApp() {
 
 /* ================= TABS ================= */
 function switchTab(tab) {
-  // cegah non-QA akses management
   if (tab === 'management' && !isSuperAdmin(session)) tab = 'dashboard';
 
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
@@ -694,7 +824,6 @@ function renderDashboard() {
   const daysInMonth = new Date(year, month, 0).getDate();
   const isCurrentMonth = (now.getFullYear() === year && now.getMonth() + 1 === month);
 
-  // QA → semua ruangan; Non-QA → hanya ruangan dept
   const roomsInScope = superAdmin
     ? getRooms()
     : getRooms().filter(r => upper(r.area) === myDept);
@@ -702,7 +831,6 @@ function renderDashboard() {
   const totalParamCount = roomsInScope.reduce((sum, r) => sum + getParamsByRoom(r.id).length, 0);
   const targetTotal = totalParamCount * SHIFT_COUNT * daysInMonth;
 
-  // record bulan ini
   const monthRecs = recs.filter(r => {
     const d = parseWaktu(r.waktu);
     if (!d) return false;
@@ -720,6 +848,8 @@ function renderDashboard() {
   const params = getParams();
 
   const cellMap = {};
+  const chartData = {};
+
   monthRecs.forEach(rec => {
     const d = parseWaktu(rec.waktu);
     if (!d) return;
@@ -730,6 +860,12 @@ function renderDashboard() {
       const p = roomParams.find(x => x.nama === v.nama);
       if (!p) return;
       cellMap[`${rec.roomId}|${p.id}|${shift}|${dateNum}`] = v;
+
+      const ck = `${rec.roomId}|${p.id}`;
+      if (!chartData[ck]) chartData[ck] = { room: getRooms().find(rr => rr.id === rec.roomId), param: p, values: {} };
+      if (!chartData[ck].values[dateNum]) chartData[ck].values[dateNum] = { sum: 0, count: 0 };
+      chartData[ck].values[dateNum].sum += Number(v.value);
+      chartData[ck].values[dateNum].count += 1;
     });
   });
 
@@ -746,6 +882,7 @@ function renderDashboard() {
     <div class="dept-info ${superAdmin ? 'super' : ''}">
       ${superAdmin ? '👑 Super Admin — Semua Area' : '🏷️ Area terkunci: ' + esc(myDept)}
     </div>
+    ${superAdmin ? `<button class="btn btn-export" onclick="exportCSV()">⬇️ Export Data (CSV)</button>` : ''}
   </div>
 
   <div class="kpi-row">
@@ -834,7 +971,102 @@ function renderDashboard() {
     html += `</tbody></table></div>`;
   }
   html += `</div>`;
+
+  /* CHART */
+  html += `<div class="card chart-section">
+    <div class="chart-title">📈 Grafik Rata-rata Harian per Parameter</div>
+    <div class="chart-sub">Sumbu X = tanggal ${MONTH_NAMES[month-1]} ${year}. Nilai = rata-rata semua shift pada tanggal tersebut. Area hijau = rentang standar.</div>
+    <div class="chart-grid">`;
+
+  const chartKeys = Object.keys(chartData);
+  if (!chartKeys.length) {
+    html += `<div class="empty" style="grid-column: 1/-1">Belum ada data untuk grafik di bulan ini.</div>`;
+  } else {
+    chartKeys.forEach((ck, idx) => {
+      const cd = chartData[ck];
+      if (!cd || !cd.room || !cd.param) return;
+      const color = CHART_COLORS[idx % CHART_COLORS.length];
+      html += `<div class="chart-card">
+        <div class="head">
+          <div class="left">
+            <div class="pname">${esc(cd.param.nama)}</div>
+            <div class="proom">${esc(cd.room.nomor)} · ${esc(cd.room.area)}</div>
+          </div>
+          <div class="std">${esc(cd.param.min)}–${esc(cd.param.max)} ${esc(cd.param.satuan)}</div>
+        </div>
+        ${renderLineChart(cd.values, daysInMonth, cd.param, color)}
+      </div>`;
+    });
+  }
+
+  html += `</div></div>`;
+
   document.getElementById('tab-dashboard').innerHTML = html;
+}
+
+function renderLineChart(valuesByDay, daysInMonth, param, color) {
+  const W = 360, H = 160;
+  const padL = 34, padR = 10, padT = 12, padB = 22;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  const pts = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const v = valuesByDay[d];
+    if (v && v.count > 0) pts.push({ day: d, val: v.sum / v.count });
+  }
+
+  const minStd = Number(param.min), maxStd = Number(param.max);
+  let minY = minStd, maxY = maxStd;
+  pts.forEach(p => { if (p.val < minY) minY = p.val; if (p.val > maxY) maxY = p.val; });
+  if (minY === maxY) { minY -= 1; maxY += 1; }
+  const padY = (maxY - minY) * 0.1;
+  minY -= padY; maxY += padY;
+
+  const x = day => padL + ((day - 1) / (daysInMonth - 1 || 1)) * chartW;
+  const y = val => padT + chartH - ((val - minY) / (maxY - minY)) * chartH;
+
+  let grid = '';
+  const gridN = 4;
+  for (let i = 0; i <= gridN; i++) {
+    const yy = padT + (chartH / gridN) * i;
+    const val = maxY - ((maxY - minY) / gridN) * i;
+    grid += `<line x1="${padL}" y1="${yy}" x2="${padL+chartW}" y2="${yy}" stroke="#eef2f7" stroke-width="1"/>`;
+    grid += `<text x="${padL - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="#94a3b8" font-weight="600">${val.toFixed(val >= 1000 ? 0 : 1)}</text>`;
+  }
+
+  const stdY1 = y(maxStd), stdY2 = y(minStd);
+  const stdRect = `<rect x="${padL}" y="${stdY1}" width="${chartW}" height="${Math.max(0, stdY2 - stdY1)}" fill="#dcfce7" opacity="0.6"/>`;
+  const stdLine1 = `<line x1="${padL}" y1="${stdY1}" x2="${padL+chartW}" y2="${stdY1}" stroke="#86efac" stroke-width="1" stroke-dasharray="3 3"/>`;
+  const stdLine2 = `<line x1="${padL}" y1="${stdY2}" x2="${padL+chartW}" y2="${stdY2}" stroke="#86efac" stroke-width="1" stroke-dasharray="3 3"/>`;
+
+  let path = '', dots = '';
+  pts.forEach((p, i) => {
+    const cx = x(p.day), cy = y(p.val);
+    if (i === 0) path += `M ${cx} ${cy}`;
+    else path += ` L ${cx} ${cy}`;
+    const outOfStd = p.val < minStd || p.val > maxStd;
+    const fill = outOfStd ? '#dc2626' : color;
+    dots += `<circle cx="${cx}" cy="${cy}" r="3" fill="${fill}" stroke="#fff" stroke-width="1.5"/>`;
+  });
+
+  let xTicks = '';
+  for (let d = 1; d <= daysInMonth; d++) {
+    if (d === 1 || d === daysInMonth || d % 5 === 0) {
+      const xx = x(d);
+      xTicks += `<text x="${xx}" y="${H - 6}" text-anchor="middle" font-size="8" fill="#94a3b8" font-weight="600">${d}</text>`;
+    }
+  }
+
+  const areaPath = pts.length > 1
+    ? `<path d="${path} L ${x(pts[pts.length-1].day)} ${padT+chartH} L ${x(pts[0].day)} ${padT+chartH} Z" fill="${color}" opacity="0.08"/>`
+    : '';
+
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    ${stdRect}${grid}${stdLine1}${stdLine2}${areaPath}
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${xTicks}
+  </svg>`;
 }
 
 function buildMonthOptions(selYear, selMonth) {
@@ -849,16 +1081,57 @@ function buildMonthOptions(selYear, selMonth) {
   return opts.join('');
 }
 
+/* ================= EXPORT CSV (QA only) ================= */
+function exportCSV() {
+  if (!isSuperAdmin(session)) return;
+  const [yStr, mStr] = (window.__dashMonth || '').split('-');
+  const year = Number(yStr), month = Number(mStr);
+  const recs = getRecords().filter(r => {
+    const d = parseWaktu(r.waktu);
+    return d && d.getFullYear() === year && (d.getMonth() + 1) === month;
+  });
+
+  if (!recs.length) return toast('Tidak ada data untuk diekspor di bulan ini', true);
+
+  const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Min','Max','Status'];
+  const rows = [header];
+  recs.slice().sort((a, b) => a.no - b.no).forEach(r => {
+    const d = parseWaktu(r.waktu);
+    const tgl = d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
+    r.values.forEach(v => {
+      rows.push([r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, v.value, v.satuan, v.min, v.max, v.ok?'OK':'NG']);
+    });
+  });
+
+  const csvEsc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const csv = rows.map(r => r.map(csvEsc).join(',')).join('\r\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const fname = `monitoring-environment_${year}-${String(month).padStart(2,'0')}.csv`;
+  a.download = fname;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  try {
+    a.click();
+    toast(`Export ${rows.length - 1} baris → ${fname}`);
+  } catch (e) {
+    toast('Download diblok sandbox — CSV di console', true);
+    console.log('CSV:\n', csv);
+  }
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+}
+
 /* ================= INPUT ================= */
 function renderInput() {
-  // QA tidak punya area sendiri (super admin), jadi tidak bisa input lewat Input tab.
-  // Kalau mau QA bisa input juga, ganti filter di bawah ke getRooms() (semua ruangan).
   const superAdmin = isSuperAdmin(session);
   const myDept = upper(session.dept);
-  const rooms = superAdmin
-    ? getRooms()
-    : getRooms().filter(r => upper(r.area) === myDept);
-
+  const rooms = superAdmin ? getRooms() : getRooms().filter(r => upper(r.area) === myDept);
   const tk = todayKey();
   const titleArea = superAdmin ? 'Semua Area (QA)' : `Area ${myDept}`;
 
@@ -871,7 +1144,6 @@ function renderInput() {
   }
   html += `<div class="card">`;
 
-  // group per area
   const byArea = {};
   rooms.forEach(r => { const a = r.area; if (!byArea[a]) byArea[a] = []; byArea[a].push(r); });
 
@@ -988,9 +1260,7 @@ function renderInputPopup() {
 }
 
 function pickShift(sh) {
-  if (isSlotFilled(currentRoomId, sh, todayKey())) {
-    return toast(`${sh} sudah diisi hari ini`, true);
-  }
+  if (isSlotFilled(currentRoomId, sh, todayKey())) return toast(`${sh} sudah diisi hari ini`, true);
   currentShift = sh;
   document.querySelectorAll('.shift-opt').forEach(el => {
     el.classList.toggle('active', el.dataset.shift === sh);
@@ -1029,18 +1299,12 @@ function submitInput() {
   const seq = load(LS.seq, { no: 1 });
   const recs = getRecords();
   recs.push({
-    id: genId(),
-    no: seq.no,
+    id: genId(), no: seq.no,
     waktu: new Date().toLocaleString('id-ID'),
     shift: currentShift,
-    roomId: room.id,
-    roomNomor: room.nomor,
-    area: room.area,
-    nik: session.nik,
-    inisial: session.inisial,
-    dept: session.dept,
-    values,
-    status: anyNg ? 'NG' : 'OK'
+    roomId: room.id, roomNomor: room.nomor, area: room.area,
+    nik: session.nik, inisial: session.inisial, dept: session.dept,
+    values, status: anyNg ? 'NG' : 'OK'
   });
   save(LS.records, recs);
   save(LS.seq, { no: seq.no + 1 });
@@ -1052,14 +1316,8 @@ function submitInput() {
   if (remaining.length) {
     setTimeout(() => {
       openModal({
-        title: 'Shift tersimpan ✓',
-        subtitle: `${room.nomor} · ${currentShift}`,
-        icon: '✅',
-        bodyHTML: `<p style="font-size:14px;color:#334155;line-height:1.6">
-          Data shift ini berhasil disimpan.<br><br>
-          Masih ada shift yang belum diisi: <b>${remaining.join(', ')}</b>.<br>
-          Mau isi shift berikutnya sekarang?
-        </p>`,
+        title: 'Shift tersimpan ✓', subtitle: `${room.nomor} · ${currentShift}`, icon: '✅',
+        bodyHTML: `<p style="font-size:14px;color:#334155;line-height:1.6">Data shift ini berhasil disimpan.<br><br>Masih ada shift yang belum diisi: <b>${remaining.join(', ')}</b>.<br>Mau isi shift berikutnya sekarang?</p>`,
         okText: `Isi ${remaining[0]}`,
         onOk: () => {
           closeModal();
@@ -1180,7 +1438,6 @@ function toggleRoomPanel(roomId) {
   renderManagement();
 }
 
-/* USER CRUD */
 function addUser() {
   const nik = upper(document.getElementById('u-nik').value);
   const inisial = upper(document.getElementById('u-inisial').value);
@@ -1222,7 +1479,6 @@ function delUser(id) {
   });
 }
 
-/* ROOM CRUD */
 function addRoom() {
   const nomor = upper(document.getElementById('r-nomor').value);
   const area = upper(document.getElementById('r-area').value);
@@ -1262,7 +1518,6 @@ function delRoom(id) {
   });
 }
 
-/* PARAM CRUD */
 function addParam(roomId) {
   const nama = upper(document.getElementById('p-nama-' + roomId).value);
   const satuan = document.getElementById('p-satuan-' + roomId).value.trim();
