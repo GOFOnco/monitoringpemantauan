@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoring Environment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    background: #eef2f7; color: #1e293b; min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .hidden { display: none !important; }
+
+  /* LOGIN */
+  #loginPage {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(37,99,235,.35), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(6,182,212,.3), transparent 50%),
+      linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    padding: 20px; position: relative; overflow: hidden;
+  }
+  #loginPage::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none;
+  }
+  .login-box {
+    background: rgba(255,255,255,.98);
+    padding: 44px 38px; border-radius: 20px; width: 400px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05);
+    position: relative; z-index: 1;
+    animation: loginIn .5s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes loginIn {
+    from { transform: translateY(20px) scale(.98); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .login-logo {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(37,99,235,.4);
+  }
+  .login-box h1 { font-size: 24px; margin-bottom: 6px; color: #0f172a; font-weight: 800; letter-spacing: -.5px; }
+  .login-box p { font-size: 13.5px; color: #64748b; margin-bottom: 26px; }
+  .login-box label { font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 7px; color: #334155; text-transform: uppercase; letter-spacing: .4px; }
+  .login-box input {
+    width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: 16px; margin-bottom: 14px; text-transform: uppercase;
+    font-family: inherit; font-weight: 600; letter-spacing: 1px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .login-box input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
+  .login-box button.main-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff;
+    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: transform .12s, box-shadow .2s;
+    box-shadow: 0 8px 20px rgba(37,99,235,.35);
+  }
+  .login-box button.main-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(37,99,235,.45); }
+  .login-box button.main-btn:active { transform: translateY(0); }
+  .err { color: #dc2626; font-size: 13px; margin-bottom: 12px; min-height: 16px; font-weight: 600; }
+  .hint {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;
+    font-size: 12px; color: #64748b; line-height: 1.8;
+  }
+  .hint b { color: #334155; }
+  .hint code {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 2px 8px; border-radius: 5px;
+    color: #1e40af; font-weight: 700; font-family: 'Courier New', monospace;
+  }
+  .hint button {
+    margin-top: 10px; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;
+    padding: 7px 14px; border-radius: 7px; font-size: 12px; cursor: pointer;
+    font-family: inherit; font-weight: 600;
+  }
+  .hint button:hover { background: #e2e8f0; }
+
+  /* APP SHELL */
+  header.topbar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #fff; padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between; height: 64px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  header.topbar .brand {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: 800; font-size: 16px; letter-spacing: .3px;
+  }
+  header.topbar .brand .dot {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    box-shadow: 0 4px 12px rgba(37,99,235,.4);
+  }
+  header.topbar .userinfo { display: flex; align-items: center; gap: 14px; font-size: 13px; }
+  header.topbar .uname { font-weight: 700; }
+  header.topbar .badge {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 11.5px;
+    letter-spacing: .4px; box-shadow: 0 2px 8px rgba(59,130,246,.4);
+  }
+  header.topbar .badge.super {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    box-shadow: 0 2px 8px rgba(168,85,247,.45);
+  }
+  header.topbar button.logout {
+    background: rgba(220,38,38,.15); color: #fca5a5; border: 1px solid rgba(220,38,38,.4);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
+    font-family: inherit; font-weight: 700; transition: all .15s;
+  }
+  header.topbar button.logout:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+  nav.tabs {
+    background: #fff; display: flex; gap: 4px; padding: 0 28px;
+    border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    position: sticky; top: 64px; z-index: 99;
+  }
+  nav.tabs button {
+    background: none; border: none; padding: 16px 22px; cursor: pointer;
+    font-size: 14px; font-weight: 700; color: #64748b;
+    border-bottom: 3px solid transparent; font-family: inherit;
+    transition: all .15s;
+  }
+  nav.tabs button:hover { color: #1e40af; background: #f8fafc; }
+  nav.tabs button.active { color: #1e40af; border-bottom-color: #2563eb; }
+  main { padding: 28px; max-width: 1500px; margin: 0 auto; }
+
+  h2.page-title {
+    font-size: 22px; margin-bottom: 20px; color: #0f172a; font-weight: 800;
+    letter-spacing: -.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  h2.page-title .sub { font-size: 13px; font-weight: 500; color: #64748b; }
+  .card {
+    background: #fff; border-radius: 16px; padding: 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+    margin-bottom: 22px; border: 1px solid rgba(226,232,240,.8);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table th, table td { padding: 11px 13px; text-align: left; border-bottom: 1px solid #eef2f7; }
+  table th { background: #f8fafc; font-size: 11.5px; text-transform: uppercase; color: #475569; letter-spacing: .5px; font-weight: 800; }
+  table tr:hover td { background: #f8fafc; }
+  .btn {
+    border: none; border-radius: 8px; padding: 8px 14px; font-size: 12.5px;
+    cursor: pointer; font-weight: 700; font-family: inherit;
+    transition: transform .1s, box-shadow .15s, background .15s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+  .btn-primary:hover { box-shadow: 0 6px 18px rgba(37,99,235,.4); }
+  .btn-danger { background: #fee2e2; color: #b91c1c; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-edit { background: #fef3c7; color: #92400e; }
+  .btn-edit:hover { background: #fde68a; }
+  .btn-secondary { background: #e2e8f0; color: #334155; }
+  .btn-secondary:hover { background: #cbd5e1; }
+  .btn-sm { padding: 6px 11px; font-size: 12px; }
+  .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+  .field label { font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: .4px; }
+  .field input, .field select {
+    padding: 10px 13px; border: 2px solid #e2e8f0; border-radius: 9px; font-size: 14px;
+    font-family: inherit; font-weight: 500; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+  .empty { color: #94a3b8; font-size: 13.5px; padding: 16px 0; text-align: center; }
+
+  /* Scorecards */
+  .area-group { margin-bottom: 26px; }
+  .area-group h3 {
+    font-size: 13px; text-transform: uppercase; color: #1e40af;
+    margin-bottom: 12px; letter-spacing: .8px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .area-group h3::before {
+    content: ''; width: 4px; height: 16px; border-radius: 2px;
+    background: linear-gradient(180deg, #2563eb, #06b6d4);
+  }
+  .scorecards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .scorecard {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e2e8f0; border-radius: 16px;
+    padding: 20px 18px; cursor: pointer;
+    transition: all .2s cubic-bezier(.16,1,.3,1); text-align: left;
+    position: relative; overflow: hidden;
+  }
+  .scorecard::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    opacity: 0; transition: opacity .2s;
+  }
+  .scorecard:hover {
+    border-color: #3b82f6; transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(37,99,235,.18);
+  }
+  .scorecard:hover::before { opacity: 1; }
+  .scorecard .room { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -.5px; }
+  .scorecard .sub { font-size: 11px; color: #64748b; margin-top: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: .4px; }
+  .scorecard .pcount {
+    font-size: 11px; margin-top: 10px; color: #1e40af; font-weight: 800;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    display: inline-block; padding: 4px 10px; border-radius: 20px;
+  }
+
+  .shift-status {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px;
+  }
+  .shift-chip {
+    font-size: 10px; font-weight: 800; text-align: center;
+    padding: 5px 4px; border-radius: 6px; letter-spacing: .3px;
+    border: 1px solid #e2e8f0; background: #f8fafc; color: #94a3b8;
+  }
+  .shift-chip.filled {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #15803d; border-color: #86efac;
+  }
+  .shift-chip.filled.ng {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #b91c1c; border-color: #fca5a5;
+  }
+  .scorecard.full {
+    border-color: #86efac;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  }
+  .scorecard.full:hover { border-color: #16a34a; }
+  .scorecard.full::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+
+  /* Dashboard */
+  .filter-bar {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;
+    background: #fff; padding: 18px 22px; border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+    margin-bottom: 22px; border: 1px solid rgba(226,232,240,.8);
+  }
+  .filter-bar .field { max-width: 240px; min-width: 200px; flex: 0 1 auto; }
+  .dept-info {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
+    color: #1e40af; background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    padding: 10px 16px; border-radius: 10px; border: 1px solid #93c5fd;
+    margin-left: auto;
+  }
+  .dept-info.super {
+    color: #7e22ce; background: linear-gradient(135deg, #fae8ff, #e9d5ff);
+    border-color: #d8b4fe;
+  }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 22px; }
+  .kpi {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+    border-left: 4px solid #2563eb;
+    border-top: 1px solid rgba(226,232,240,.8);
+    border-right: 1px solid rgba(226,232,240,.8);
+    border-bottom: 1px solid rgba(226,232,240,.8);
+    position: relative; overflow: hidden;
+  }
+  .kpi::after {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,.1), transparent 70%);
+  }
+  .kpi .num { font-size: 30px; font-weight: 800; color: #0f172a; letter-spacing: -1px; line-height: 1.1; }
+  .kpi .num .den { font-size: 16px; color: #64748b; font-weight: 700; }
+  .kpi .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .6px; font-weight: 800; margin-top: 4px; }
+  .kpi .sub-lbl { font-size: 10.5px; color: #94a3b8; font-weight: 600; margin-top: 3px; }
+  .kpi.ok { border-left-color: #16a34a; }
+  .kpi.ng { border-left-color: #dc2626; }
+
+  .badge-area { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: .3px; }
+  .badge-area.qa { background: linear-gradient(135deg, #fae8ff, #e9d5ff); color: #7e22ce; }
+  .toast {
+    position: fixed; bottom: 26px; right: 26px;
+    background: linear-gradient(135deg, #16a34a, #15803d); color: #fff;
+    padding: 14px 22px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    opacity: 0; transform: translateY(12px); transition: all .3s cubic-bezier(.16,1,.3,1);
+    pointer-events: none; z-index: 2000;
+    box-shadow: 0 12px 30px rgba(22,163,74,.35);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.bad { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 12px 30px rgba(220,38,38,.35); }
+
+  /* Matrix */
+  .matrix-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
+  table.matrix { font-size: 12px; min-width: max-content; }
+  table.matrix th, table.matrix td { padding: 8px 6px; text-align: center; border-right: 1px solid #eef2f7; }
+  table.matrix th { background: #f1f5f9; color: #334155; font-size: 10.5px; white-space: nowrap; position: sticky; top: 0; }
+  table.matrix th.room-h, table.matrix td.room-c { text-align: left; position: sticky; left: 0; background: #fff; z-index: 2; min-width: 90px; }
+  table.matrix th.param-h, table.matrix td.param-c { text-align: left; position: sticky; left: 90px; background: #fff; z-index: 2; min-width: 140px; }
+  table.matrix th.shift-h, table.matrix td.shift-c { text-align: center; position: sticky; left: 230px; background: #fff; z-index: 2; min-width: 60px; border-right: 2px solid #cbd5e1; }
+  table.matrix th.room-h { z-index: 3; background: #f1f5f9; }
+  table.matrix th.param-h { z-index: 3; background: #f1f5f9; }
+  table.matrix th.shift-h { z-index: 3; background: #f1f5f9; }
+  table.matrix td.room-c { font-weight: 800; color: #0f172a; background: #f8fafc; font-size: 12px; }
+  table.matrix td.param-c { font-weight: 600; color: #334155; font-size: 11.5px; }
+  table.matrix td.param-c small { display: block; color: #94a3b8; font-weight: 500; font-size: 10px; }
+  table.matrix td.shift-c { font-weight: 800; color: #1e40af; font-size: 11.5px; }
+  table.matrix td.val { font-weight: 600; color: #0f172a; min-width: 42px; }
+  table.matrix td.val.empty-cell { color: #cbd5e1; font-weight: 400; }
+  table.matrix td.val.ng {
+    background: #fee2e2; color: #b91c1c; font-weight: 800;
+    box-shadow: inset 0 0 0 1px #fca5a5;
+  }
+  table.matrix td.val.ok { color: #15803d; }
+  table.matrix td.val.ng:hover { background: #fecaca; }
+  table.matrix td.val.ok:hover { background: #dcfce7; }
+  table.matrix th.today { background: #dbeafe; color: #1e40af; }
+  .matrix-legend {
+    display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; font-size: 12px;
+    color: #64748b; align-items: center; font-weight: 600;
+  }
+  .matrix-legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+  .matrix-legend .dot.ng { background: #fee2e2; border: 1px solid #fca5a5; }
+  .matrix-legend .dot.ok { background: #dcfce7; border: 1px solid #86efac; }
+  .matrix-legend .dot.empty { background: #f8fafc; border: 1px solid #e2e8f0; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,.55); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+    animation: fadeIn .15s ease-out;
+  }
+  .modal-overlay.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: #fff; border-radius: 20px; width: 100%; max-width: 480px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.4);
+    animation: modalIn .25s cubic-bezier(.16,1,.3,1);
+    max-height: 90vh; display: flex; flex-direction: column;
+  }
+  .modal.wide { max-width: 640px; }
+  @keyframes modalIn {
+    from { transform: translateY(20px) scale(.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .modal-head {
+    padding: 20px 24px; border-bottom: 1px solid #e2e8f0;
+    font-size: 17px; font-weight: 800; color: #0f172a;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .modal-head .ico {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .modal-head .h-sub { font-size: 12px; color: #64748b; font-weight: 600; margin-top: 2px; }
+  .modal-body {
+    padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;
+    overflow-y: auto;
+  }
+  .modal-body .field { min-width: 0; }
+  .modal-foot {
+    padding: 16px 24px; border-top: 1px solid #e2e8f0;
+    display: flex; justify-content: flex-end; gap: 10px;
+  }
+  .modal-msg { font-size: 12.5px; color: #dc2626; min-height: 16px; padding: 0 24px; font-weight: 600; }
+  .param-input-row {
+    display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+    padding: 12px 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;
+  }
+  .param-input-row .pinfo { font-size: 13px; }
+  .param-input-row .pinfo b { color: #0f172a; }
+  .param-input-row .pinfo .std { font-size: 11px; color: #64748b; margin-top: 2px; display: block; }
+  .param-input-row input {
+    width: 110px; padding: 9px 12px; border: 2px solid #cbd5e1; border-radius: 8px;
+    font-family: inherit; font-weight: 700; font-size: 14px; text-align: center;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .param-input-row input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+  .param-input-row.invalid { background: #fef2f2; border-color: #fecaca; }
+  .param-input-row.invalid input { border-color: #fca5a5; }
+
+  .shift-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .shift-opt {
+    padding: 14px 10px; border: 2px solid #e2e8f0; border-radius: 10px;
+    cursor: pointer; text-align: center; transition: all .15s;
+    background: #fff; font-weight: 700; font-size: 13px; color: #475569;
+    position: relative;
+  }
+  .shift-opt:hover:not(.disabled) { border-color: #93c5fd; background: #f0f9ff; }
+  .shift-opt.active {
+    border-color: #2563eb; background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #1e40af; box-shadow: 0 4px 12px rgba(37,99,235,.15);
+  }
+  .shift-opt .big { font-size: 20px; display: block; margin-bottom: 2px; }
+  .shift-opt.disabled {
+    cursor: not-allowed; opacity: .55;
+    background: #f1f5f9; border-color: #e2e8f0;
+  }
+  .shift-opt.disabled::after {
+    content: '✓ TERISI'; position: absolute; top: 4px; right: 4px;
+    font-size: 8.5px; font-weight: 800; background: #16a34a; color: #fff;
+    padding: 2px 5px; border-radius: 4px; letter-spacing: .3px;
+  }
+  .already-note {
+    background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+    padding: 10px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Management */
+  .room-block { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #fff; }
+  .room-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    cursor: pointer; transition: background .15s;
+  }
+  .room-head:hover { background: #eef2f7; }
+  .room-head .left { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+  .room-head .right { display: flex; gap: 8px; }
+  .room-body { padding: 18px; border-top: 1px solid #e2e8f0; }
+  .room-body h4 { font-size: 12px; text-transform: uppercase; color: #475569; margin-bottom: 12px; letter-spacing: .5px; font-weight: 800; }
+  .chev { transition: transform .2s; display: inline-block; color: #64748b; font-size: 10px; }
+  .chev.open { transform: rotate(90deg); }
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🌡️</div>
+    <h1>Monitoring Environment</h1>
+    <p>Sistem pemantauan parameter ruangan per shift</p>
+    <label>NIK</label>
+    <input id="loginNik" placeholder="Masukkan NIK" autocomplete="off">
+    <div class="err" id="loginErr"></div>
+    <button class="main-btn" onclick="doLogin()">Login</button>
+    <div class="hint">
+      <b>NIK default untuk coba:</b><br>
+      • <code>1001</code> — QC<br>
+      • <code>1002</code> — LOGISTIC<br>
+      • <code>1003</code> — PRODUKSI<br>
+      • <code>1004</code> — QA (super admin)<br>
+      <button onclick="resetAll()">Reset Data</button>
+      <div style="margin-top:10px;font-size:11px;color:#94a3b8">
+        Mode sandbox: data tersimpan di memori (hilang saat refresh).
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="appPage" class="hidden">
+  <header class="topbar">
+    <div class="brand"><div class="dot">🌡️</div>MONITORING ENVIRONMENT</div>
+    <div class="userinfo">
+      <span class="uname" id="userLabel"></span>
+      <span class="badge" id="userDept"></span>
+      <button class="logout" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+  <nav class="tabs" id="mainTabs">
+    <button data-tab="dashboard" class="active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button data-tab="input" onclick="switchTab('input')">✍️ Input</button>
+    <button data-tab="management" id="tabBtnManagement" onclick="switchTab('management')">⚙️ Management</button>
+  </nav>
+  <main>
+    <div id="tab-dashboard"></div>
+    <div id="tab-input" class="hidden"></div>
+    <div id="tab-management" class="hidden"></div>
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-head" id="modalHead"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STORAGE ================= */
+const LS = { users:'me_users', rooms:'me_rooms', params:'me_params', records:'me_records', session:'me_session', seq:'me_seq' };
+const memStore = {};
+const storage = {
+  getItem(k) { return k in memStore ? memStore[k] : null; },
+  setItem(k, v) { memStore[k] = String(v); },
+  removeItem(k) { delete memStore[k]; },
+  clear() { for (const k in memStore) delete memStore[k]; }
+};
+const load = (k, d) => { try { return JSON.parse(storage.getItem(k)) ?? d; } catch { return d; } };
+const save = (k, v) => storage.setItem(k, JSON.stringify(v));
+const upper = s => String(s ?? '').toUpperCase().trim();
+const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const SHIFTS = ['SHIFT 1', 'SHIFT 2', 'SHIFT 3'];
+const SHIFT_COUNT = SHIFTS.length;
+const DEPARTMENTS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
+const AREAS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
+
+const isSuperAdmin = user => user && upper(user.dept) === 'QA';
+
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const toDateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parseWaktu = str => {
+  try {
+    const m = String(str).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!m) return null;
+    return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+  } catch { return null; }
+};
+
+/* ================= SEED ================= */
+function seed(force) {
+  const marker = 'me_seed_v8_qa';
+  if (!force && storage.getItem(marker)) return;
+  [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
+
+  save(LS.users, [
+    { id: genId(), nik: '1001', inisial: 'ADM', dept: 'QC' },
+    { id: genId(), nik: '1002', inisial: 'LOG', dept: 'LOGISTIC' },
+    { id: genId(), nik: '1003', inisial: 'PRD', dept: 'PRODUKSI' },
+    { id: genId(), nik: '1004', inisial: 'QA',  dept: 'QA' }
+  ]);
+
+  const roomQC1 = genId(), roomQC2 = genId(), roomLOG = genId(), roomPRD1 = genId(), roomPRD2 = genId();
+  save(LS.rooms, [
+    { id: roomQC1, nomor: 'R-101', area: 'QC' },
+    { id: roomQC2, nomor: 'R-102', area: 'QC' },
+    { id: roomLOG, nomor: 'R-201', area: 'LOGISTIC' },
+    { id: roomPRD1, nomor: 'R-301', area: 'PRODUKSI' },
+    { id: roomPRD2, nomor: 'R-302', area: 'PRODUKSI' }
+  ]);
+
+  save(LS.params, [
+    { id: genId(), roomId: roomQC1, nama: 'SUHU', satuan: '°C', min: 18, max: 26 },
+    { id: genId(), roomId: roomQC1, nama: 'KELEMBAPAN', satuan: '%', min: 40, max: 60 },
+    { id: genId(), roomId: roomQC2, nama: 'SUHU', satuan: '°C', min: 20, max: 25 },
+    { id: genId(), roomId: roomLOG, nama: 'SUHU', satuan: '°C', min: 15, max: 30 },
+    { id: genId(), roomId: roomLOG, nama: 'KELEMBAPAN', satuan: '%', min: 30, max: 70 },
+    { id: genId(), roomId: roomPRD1, nama: 'SUHU', satuan: '°C', min: 20, max: 28 },
+    { id: genId(), roomId: roomPRD1, nama: 'TEKANAN UDARA', satuan: 'PA', min: 100000, max: 102000 },
+    { id: genId(), roomId: roomPRD2, nama: 'SUHU', satuan: '°C', min: 22, max: 30 }
+  ]);
+
+  save(LS.records, []);
+  save(LS.seq, { no: 1 });
+  storage.setItem(marker, '1');
+}
+seed(false);
+
+function resetAll() {
+  showConfirm('Reset Data', 'Hapus semua data dan reset ke default?', () => {
+    storage.clear(); seed(true); location.reload();
+  });
+}
+
+const getUsers = () => load(LS.users, []);
+const getRooms = () => load(LS.rooms, []);
+const getParams = () => load(LS.params, []);
+const getParamsByRoom = roomId => getParams().filter(p => p.roomId === roomId);
+const getRecords = () => load(LS.records, []);
+
+function isSlotFilled(roomId, shift, dateKey) {
+  return getRecords().some(r => {
+    const d = parseWaktu(r.waktu);
+    if (!d) return false;
+    return r.roomId === roomId && r.shift === shift && toDateKey(d) === dateKey;
+  });
+}
+function getSlotRecord(roomId, shift, dateKey) {
+  return getRecords().find(r => {
+    const d = parseWaktu(r.waktu);
+    if (!d) return false;
+    return r.roomId === roomId && r.shift === shift && toDateKey(d) === dateKey;
+  });
+}
+
+/* ================= MODAL ================= */
+let modalOkHandler = null;
+function openModal({ title, subtitle, icon, bodyHTML, okText, okClass, wide, onOk, okDisabled }) {
+  document.getElementById('modalHead').innerHTML =
+    `<div class="ico">${icon || '⚙️'}</div>
+     <div><div>${esc(title)}</div>${subtitle ? `<div class="h-sub">${esc(subtitle)}</div>` : ''}</div>`;
+  document.getElementById('modalBody').innerHTML = bodyHTML;
+  document.getElementById('modalMsg').textContent = '';
+  document.getElementById('modalBox').classList.toggle('wide', !!wide);
+  const okBtn = document.getElementById('modalOkBtn');
+  okBtn.textContent = okText || 'OK';
+  okBtn.className = 'btn ' + (okClass || 'btn-primary');
+  okBtn.disabled = !!okDisabled;
+  okBtn.style.opacity = okDisabled ? '.5' : '1';
+  okBtn.style.cursor = okDisabled ? 'not-allowed' : 'pointer';
+  modalOkHandler = onOk;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  modalOkHandler = null;
+}
+function modalError(msg) { document.getElementById('modalMsg').textContent = msg; }
+document.getElementById('modalOkBtn').addEventListener('click', () => {
+  if (document.getElementById('modalOkBtn').disabled) return;
+  if (modalOkHandler) modalOkHandler();
+});
+
+function showConfirm(title, message, onYes) {
+  openModal({
+    title, subtitle: 'Konfirmasi', icon: '⚠️',
+    bodyHTML: `<p style="font-size:14px;color:#334155;line-height:1.6">${esc(message)}</p>`,
+    okText: 'Ya, Lanjutkan', okClass: 'btn-danger',
+    onOk: () => { closeModal(); onYes(); }
+  });
+}
+function mField(label, id, value, opts = {}) {
+  const t = opts.type || 'text';
+  const list = opts.list ? ` list="${opts.list}"` : '';
+  return `<div class="field"><label>${esc(label)}</label>
+    <input type="${t}" id="${id}" value="${esc(value)}"${list} ${opts.step ? `step="${opts.step}"` : ''} ${opts.uppercase ? 'style="text-transform:uppercase"' : ''}>
+  </div>`;
+}
+
+/* ================= SESSION ================= */
+let session = null;
+function doLogin() {
+  const nik = upper(document.getElementById('loginNik').value);
+  const err = document.getElementById('loginErr');
+  if (!nik) { err.textContent = 'NIK wajib diisi'; return; }
+  const user = getUsers().find(u => upper(u.nik) === nik);
+  if (!user) { err.textContent = 'NIK tidak terdaftar. Coba 1001 / 1002 / 1003 / 1004.'; return; }
+  session = user; save(LS.session, user);
+  err.textContent = ''; enterApp();
+}
+function doLogout() {
+  session = null; storage.removeItem(LS.session);
+  document.getElementById('appPage').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginNik').value = '';
+}
+function enterApp() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appPage').classList.remove('hidden');
+  document.getElementById('userLabel').textContent = `${session.inisial} (${session.nik})`;
+  const deptBadge = document.getElementById('userDept');
+  deptBadge.textContent = session.dept;
+  deptBadge.className = 'badge' + (isSuperAdmin(session) ? ' super' : '');
+
+  // Tampilkan/sembunyikan tab Management
+  const mgmtBtn = document.getElementById('tabBtnManagement');
+  mgmtBtn.classList.toggle('hidden', !isSuperAdmin(session));
+
+  switchTab('dashboard');
+}
+
+/* ================= TABS ================= */
+function switchTab(tab) {
+  // cegah non-QA akses management
+  if (tab === 'management' && !isSuperAdmin(session)) tab = 'dashboard';
+
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  ['dashboard', 'input', 'management'].forEach(t => document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab));
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'input') renderInput();
+  if (tab === 'management') renderManagement();
+}
+function toast(msg, bad) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (bad ? ' bad' : '');
+  setTimeout(() => t.className = 'toast', 2200);
+}
+
+/* ================= DASHBOARD ================= */
+function renderDashboard() {
+  const superAdmin = isSuperAdmin(session);
+  const myDept = upper(session.dept);
+  const recs = getRecords();
+  const now = new Date();
+  if (!window.__dashMonth) window.__dashMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  const [yStr, mStr] = window.__dashMonth.split('-');
+  const year = Number(yStr), month = Number(mStr);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const isCurrentMonth = (now.getFullYear() === year && now.getMonth() + 1 === month);
+
+  // QA → semua ruangan; Non-QA → hanya ruangan dept
+  const roomsInScope = superAdmin
+    ? getRooms()
+    : getRooms().filter(r => upper(r.area) === myDept);
+
+  const totalParamCount = roomsInScope.reduce((sum, r) => sum + getParamsByRoom(r.id).length, 0);
+  const targetTotal = totalParamCount * SHIFT_COUNT * daysInMonth;
+
+  // record bulan ini
+  const monthRecs = recs.filter(r => {
+    const d = parseWaktu(r.waktu);
+    if (!d) return false;
+    if (d.getFullYear() !== year || (d.getMonth() + 1) !== month) return false;
+    if (!superAdmin && upper(r.area) !== myDept) return false;
+    return true;
+  });
+
+  const filledCount = monthRecs.length;
+  const okCount = monthRecs.filter(r => r.status === 'OK').length;
+  const ngCount = filledCount - okCount;
+  const pct = targetTotal > 0 ? Math.round((filledCount / targetTotal) * 100) : 0;
+
+  const rooms = roomsInScope;
+  const params = getParams();
+
+  const cellMap = {};
+  monthRecs.forEach(rec => {
+    const d = parseWaktu(rec.waktu);
+    if (!d) return;
+    const dateNum = d.getDate();
+    const shift = rec.shift || 'SHIFT 1';
+    const roomParams = params.filter(p => p.roomId === rec.roomId);
+    rec.values.forEach(v => {
+      const p = roomParams.find(x => x.nama === v.nama);
+      if (!p) return;
+      cellMap[`${rec.roomId}|${p.id}|${shift}|${dateNum}`] = v;
+    });
+  });
+
+  const monthOpts = buildMonthOptions(year, month);
+  const scopeLabel = superAdmin ? 'Semua Area' : `Area ${myDept}`;
+
+  let html = `<h2 class="page-title">📊 Dashboard Monitoring
+    <span class="sub">— ${MONTH_NAMES[month-1]} ${year}</span>
+  </h2>
+  <div class="filter-bar">
+    <div class="field"><label>Bulan</label>
+      <select onchange="window.__dashMonth=this.value;renderDashboard()">${monthOpts}</select>
+    </div>
+    <div class="dept-info ${superAdmin ? 'super' : ''}">
+      ${superAdmin ? '👑 Super Admin — Semua Area' : '🏷️ Area terkunci: ' + esc(myDept)}
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="num">${filledCount} <span class="den">/ ${targetTotal}</span></div>
+      <div class="lbl">Total Pemantauan</div>
+      <div class="sub-lbl">${pct}% · ${totalParamCount} parameter × ${SHIFT_COUNT} shift × ${daysInMonth} hari · ${esc(scopeLabel)}</div>
+    </div>
+    <div class="kpi ok"><div class="num">${okCount}</div><div class="lbl">Status OK</div><div class="sub-lbl">dari ${filledCount} terisi</div></div>
+    <div class="kpi ng"><div class="num">${ngCount}</div><div class="lbl">Status NG</div><div class="sub-lbl">di luar standar</div></div>
+  </div>`;
+
+  html += `<div class="card" style="padding:18px 18px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a">Matriks Pemantauan Harian (per Shift) — ${esc(scopeLabel)}</div>
+      <div class="matrix-legend">
+        <span><span class="dot ng"></span>Di luar standar</span>
+        <span><span class="dot ok"></span>Memenuhi standar</span>
+        <span><span class="dot empty"></span>Belum diisi</span>
+      </div>
+    </div>`;
+
+  const rows = [];
+  rooms.forEach(room => {
+    const rParams = params.filter(p => p.roomId === room.id);
+    if (!rParams.length) {
+      rows.push({ room, param: null, shift: null });
+    } else {
+      rParams.forEach(p => {
+        SHIFTS.forEach(sh => rows.push({ room, param: p, shift: sh }));
+      });
+    }
+  });
+
+  if (!rooms.length) {
+    html += `<div class="empty">Belum ada ruangan${superAdmin ? '' : ' untuk area ' + esc(myDept)}. Hubungi admin.</div>`;
+  } else if (!rows.length) {
+    html += `<div class="empty">Belum ada parameter${superAdmin ? '' : ' untuk ruangan area ' + esc(myDept)}.</div>`;
+  } else {
+    html += `<div class="matrix-wrap"><table class="matrix">
+      <thead><tr>
+        <th class="room-h">Ruangan</th>
+        <th class="param-h">Parameter</th>
+        <th class="shift-h">Shift</th>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday = isCurrentMonth && d === now.getDate();
+      html += `<th class="${isToday ? 'today' : ''}">${String(d).padStart(2,'0')}</th>`;
+    }
+    html += `</tr></thead><tbody>`;
+
+    let prevRoomId = null, prevParamId = null;
+    rows.forEach(({ room, param, shift }) => {
+      html += `<tr>`;
+      if (room.id !== prevRoomId) {
+        const rParams = params.filter(p => p.roomId === room.id);
+        const rpCount = rParams.length || 1;
+        const span = rpCount * SHIFTS.length;
+        html += `<td class="room-c" rowspan="${span}">${esc(room.nomor)}<br><small style="font-weight:600;color:#64748b;font-size:10px">${esc(room.area)}</small></td>`;
+        prevRoomId = room.id;
+        prevParamId = null;
+      }
+      if (param) {
+        if (param.id !== prevParamId) {
+          html += `<td class="param-c" rowspan="${SHIFTS.length}">${esc(param.nama)}<small>${esc(param.satuan)} · ${esc(param.min)}–${esc(param.max)}</small></td>`;
+          prevParamId = param.id;
+        }
+        html += `<td class="shift-c">${esc(shift)}</td>`;
+        for (let d = 1; d <= daysInMonth; d++) {
+          const key = `${room.id}|${param.id}|${shift}|${d}`;
+          const cell = cellMap[key];
+          const isToday = isCurrentMonth && d === now.getDate();
+          if (!cell) {
+            html += `<td class="val empty-cell${isToday ? ' today' : ''}">–</td>`;
+          } else {
+            const cls = cell.ok ? 'ok' : 'ng';
+            html += `<td class="val ${cls}${isToday ? ' today' : ''}" title="${esc(param.nama)} · ${esc(shift)}: ${esc(cell.value)} ${esc(cell.satuan)}">${esc(cell.value)}</td>`;
+          }
+        }
+      } else {
+        html += `<td class="param-c" style="color:#94a3b8;font-style:italic">Belum ada parameter</td>`;
+        html += `<td class="shift-c">–</td>`;
+        for (let d = 1; d <= daysInMonth; d++) html += `<td class="val empty-cell">–</td>`;
+      }
+      html += `</tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  html += `</div>`;
+  document.getElementById('tab-dashboard').innerHTML = html;
+}
+
+function buildMonthOptions(selYear, selMonth) {
+  const now = new Date(); const opts = [];
+  for (let i = 11; i >= -1; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear(), m = d.getMonth() + 1;
+    const val = `${y}-${String(m).padStart(2,'0')}`;
+    const sel = (y === selYear && m === selMonth) ? 'selected' : '';
+    opts.push(`<option value="${val}" ${sel}>${MONTH_NAMES[m-1]} ${y}</option>`);
+  }
+  return opts.join('');
+}
+
+/* ================= INPUT ================= */
+function renderInput() {
+  // QA tidak punya area sendiri (super admin), jadi tidak bisa input lewat Input tab.
+  // Kalau mau QA bisa input juga, ganti filter di bawah ke getRooms() (semua ruangan).
+  const superAdmin = isSuperAdmin(session);
+  const myDept = upper(session.dept);
+  const rooms = superAdmin
+    ? getRooms()
+    : getRooms().filter(r => upper(r.area) === myDept);
+
+  const tk = todayKey();
+  const titleArea = superAdmin ? 'Semua Area (QA)' : `Area ${myDept}`;
+
+  let html = `<h2 class="page-title">✍️ Input Pemantauan <span class="sub">— ${esc(titleArea)} · ${new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}</span></h2>`;
+
+  if (!rooms.length) {
+    html += `<div class="card"><div class="empty">Belum ada ruangan untuk area ${esc(titleArea)}.</div></div>`;
+    document.getElementById('tab-input').innerHTML = html;
+    return;
+  }
+  html += `<div class="card">`;
+
+  // group per area
+  const byArea = {};
+  rooms.forEach(r => { const a = r.area; if (!byArea[a]) byArea[a] = []; byArea[a].push(r); });
+
+  Object.keys(byArea).forEach(area => {
+    html += `<div class="area-group"><h3>Area ${esc(area)}</h3><div class="scorecards">`;
+    byArea[area].forEach(r => {
+      const pcount = getParamsByRoom(r.id).length;
+      const shiftStatus = SHIFTS.map(sh => {
+        const rec = getSlotRecord(r.id, sh, tk);
+        return { shift: sh, filled: !!rec, ng: rec ? rec.status === 'NG' : false };
+      });
+      const filledCount = shiftStatus.filter(s => s.filled).length;
+      const isFull = filledCount === SHIFTS.length;
+      html += `<div class="scorecard ${isFull ? 'full' : ''}" onclick="openInputForm('${r.id}')">
+        <div class="room">${esc(r.nomor)}</div>
+        <div class="sub">${esc(r.area)}</div>
+        <div class="pcount">${pcount} parameter · ${filledCount}/3 shift terisi</div>
+        <div class="shift-status">
+          ${shiftStatus.map(s => `<div class="shift-chip ${s.filled ? 'filled' : ''} ${s.ng ? 'ng' : ''}">
+            ${s.shift.split(' ')[1]}${s.filled ? ' ✓' : ''}
+          </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  document.getElementById('tab-input').innerHTML = html;
+}
+
+let currentShift = 'SHIFT 1';
+let currentRoomId = null;
+
+function openInputForm(roomId) {
+  const room = getRooms().find(r => r.id === roomId);
+  if (!room) return;
+  const params = getParamsByRoom(roomId);
+  const tk = todayKey();
+
+  if (!params.length) {
+    openModal({
+      title: `Ruangan ${room.nomor}`, subtitle: 'Belum ada parameter', icon: '⚠️',
+      bodyHTML: `<p style="font-size:14px;color:#334155;line-height:1.6">Ruangan ini belum punya parameter. Tambahkan dulu di <b>Management</b>.</p>`,
+      okText: 'Mengerti', onOk: () => closeModal()
+    });
+    return;
+  }
+
+  const allFilled = SHIFTS.every(sh => isSlotFilled(roomId, sh, tk));
+  if (allFilled) {
+    openModal({
+      title: `Ruangan ${room.nomor}`, subtitle: 'Sudah lengkap', icon: '🔒',
+      bodyHTML: `<div class="already-note">🔒 Semua shift (1, 2, 3) untuk ruangan ini <b>sudah diisi</b> hari ini. Input baru akan tersedia besok.</div>`,
+      okText: 'Mengerti', onOk: () => closeModal()
+    });
+    return;
+  }
+
+  currentShift = SHIFTS.find(sh => !isSlotFilled(roomId, sh, tk)) || 'SHIFT 1';
+  currentRoomId = roomId;
+
+  renderInputPopup();
+
+  params.forEach(p => {
+    const input = document.getElementById('val-' + p.id);
+    if (!input) return;
+    input.addEventListener('input', () => {
+      const row = document.getElementById('row-' + p.id);
+      const v = input.value.trim();
+      if (v === '') { row.classList.remove('invalid'); return; }
+      const num = Number(v);
+      if (Number.isNaN(num)) { row.classList.add('invalid'); return; }
+      row.classList.toggle('invalid', !(num >= Number(p.min) && num <= Number(p.max)));
+    });
+  });
+}
+
+function renderInputPopup() {
+  const room = getRooms().find(r => r.id === currentRoomId);
+  const params = getParamsByRoom(currentRoomId);
+  const tk = todayKey();
+
+  const shiftPicker = `<div class="field" style="gap:8px">
+    <label>Pilih Shift</label>
+    <div class="shift-picker" id="shiftPicker">
+      ${SHIFTS.map(sh => {
+        const filled = isSlotFilled(currentRoomId, sh, tk);
+        const cls = 'shift-opt' + (sh === currentShift ? ' active' : '') + (filled ? ' disabled' : '');
+        return `<div class="${cls}" data-shift="${sh}" ${filled ? '' : `onclick="pickShift('${sh}')"`}>
+          <span class="big">${sh.split(' ')[1]}</span>${sh}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  const paramsHTML = params.map(p => `
+    <div class="param-input-row" id="row-${p.id}">
+      <div class="pinfo">
+        <b>${esc(p.nama)}</b> <span style="color:#64748b">(${esc(p.satuan)})</span>
+        <span class="std">Standar: ${esc(p.min)} – ${esc(p.max)} ${esc(p.satuan)}</span>
+      </div>
+      <input type="number" step="any" id="val-${p.id}" placeholder="0" inputmode="decimal">
+    </div>
+  `).join('');
+
+  openModal({
+    title: `Form Pemantauan — ${room.nomor}`,
+    subtitle: `Area ${room.area} · ${params.length} parameter`,
+    icon: '📝', wide: true,
+    bodyHTML: shiftPicker + `<div style="height:4px"></div>` + paramsHTML,
+    okText: 'Submit Pemantauan',
+    onOk: () => submitInput()
+  });
+}
+
+function pickShift(sh) {
+  if (isSlotFilled(currentRoomId, sh, todayKey())) {
+    return toast(`${sh} sudah diisi hari ini`, true);
+  }
+  currentShift = sh;
+  document.querySelectorAll('.shift-opt').forEach(el => {
+    el.classList.toggle('active', el.dataset.shift === sh);
+  });
+}
+
+function submitInput() {
+  const room = getRooms().find(r => r.id === currentRoomId);
+  const params = getParamsByRoom(currentRoomId);
+  const tk = todayKey();
+
+  if (isSlotFilled(currentRoomId, currentShift, tk)) {
+    modalError(`Shift ini sudah diisi untuk ruangan ${room.nomor} hari ini. Pilih shift lain.`);
+    return;
+  }
+
+  const values = [];
+  let allFilled = true, invalid = false, anyNg = false;
+
+  for (const p of params) {
+    const el = document.getElementById('val-' + p.id);
+    const raw = el ? el.value.trim() : '';
+    if (raw === '') { allFilled = false; continue; }
+    const num = Number(raw);
+    if (Number.isNaN(num)) { invalid = true; continue; }
+    const ok = num >= Number(p.min) && num <= Number(p.max);
+    if (!ok) anyNg = true;
+    values.push({ nama: p.nama, satuan: p.satuan, min: p.min, max: p.max, value: num, ok });
+  }
+
+  if (!allFilled || invalid || !values.length) {
+    modalError('Semua parameter wajib diisi dengan angka valid.');
+    return;
+  }
+
+  const seq = load(LS.seq, { no: 1 });
+  const recs = getRecords();
+  recs.push({
+    id: genId(),
+    no: seq.no,
+    waktu: new Date().toLocaleString('id-ID'),
+    shift: currentShift,
+    roomId: room.id,
+    roomNomor: room.nomor,
+    area: room.area,
+    nik: session.nik,
+    inisial: session.inisial,
+    dept: session.dept,
+    values,
+    status: anyNg ? 'NG' : 'OK'
+  });
+  save(LS.records, recs);
+  save(LS.seq, { no: seq.no + 1 });
+
+  closeModal();
+  toast(`✓ ${currentShift} · ${room.nomor} tersimpan`);
+
+  const remaining = SHIFTS.filter(sh => !isSlotFilled(room.id, sh, tk));
+  if (remaining.length) {
+    setTimeout(() => {
+      openModal({
+        title: 'Shift tersimpan ✓',
+        subtitle: `${room.nomor} · ${currentShift}`,
+        icon: '✅',
+        bodyHTML: `<p style="font-size:14px;color:#334155;line-height:1.6">
+          Data shift ini berhasil disimpan.<br><br>
+          Masih ada shift yang belum diisi: <b>${remaining.join(', ')}</b>.<br>
+          Mau isi shift berikutnya sekarang?
+        </p>`,
+        okText: `Isi ${remaining[0]}`,
+        onOk: () => {
+          closeModal();
+          currentShift = remaining[0];
+          currentRoomId = room.id;
+          openInputForm(room.id);
+        }
+      });
+      const cancelBtn = document.querySelector('.modal-foot .btn-secondary');
+      if (cancelBtn) {
+        cancelBtn.textContent = 'Nanti';
+        cancelBtn.onclick = () => { closeModal(); renderInput(); };
+      }
+    }, 400);
+  } else {
+    renderInput();
+  }
+}
+
+/* ================= MANAGEMENT ================= */
+let openRoomId = null;
+
+function renderManagement() {
+  if (!isSuperAdmin(session)) {
+    document.getElementById('tab-management').innerHTML =
+      `<div class="card"><div class="empty">Halaman Management hanya untuk user QA.</div></div>`;
+    return;
+  }
+
+  const users = getUsers();
+  const rooms = getRooms();
+  const params = getParams();
+
+  let html = `<h2 class="page-title">⚙️ Management <span class="sub">— Super Admin (QA)</span></h2>`;
+
+  html += `<div class="card">
+    <h3 style="font-size:15px;margin-bottom:14px;font-weight:800">👥 Manajemen User</h3>
+    <div class="form-row">
+      <div class="field"><label>NIK</label><input id="u-nik" placeholder="NIK" style="text-transform:uppercase"></div>
+      <div class="field"><label>Inisial</label><input id="u-inisial" placeholder="INISIAL" style="text-transform:uppercase"></div>
+      <div class="field"><label>Departemen</label>
+        <select id="u-dept">${DEPARTMENTS.map(d => `<option>${d}</option>`).join('')}</select>
+      </div>
+      <div class="field" style="flex:0"><button class="btn btn-primary" onclick="addUser()">+ Tambah User</button></div>
+    </div>
+    <table><thead><tr><th>NIK</th><th>Inisial</th><th>Departemen</th><th>Aksi</th></tr></thead><tbody>`;
+  if (!users.length) html += `<tr><td colspan="4" class="empty">Belum ada user</td></tr>`;
+  users.forEach(u => {
+    const isQA = upper(u.dept) === 'QA';
+    html += `<tr>
+      <td><b>${esc(u.nik)}</b></td><td>${esc(u.inisial)}</td>
+      <td><span class="badge-area ${isQA ? 'qa' : ''}">${esc(u.dept)}</span></td>
+      <td><button class="btn btn-edit btn-sm" onclick="editUser('${u.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="delUser('${u.id}')">Delete</button></td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  html += `<div class="card">
+    <h3 style="font-size:15px;margin-bottom:14px;font-weight:800">🏢 Manajemen Ruangan & Parameter</h3>
+    <div class="form-row">
+      <div class="field"><label>Nomor Ruangan</label><input id="r-nomor" placeholder="R-XXX" style="text-transform:uppercase"></div>
+      <div class="field"><label>Area</label>
+        <select id="r-area">${AREAS.map(a => `<option>${a}</option>`).join('')}</select>
+      </div>
+      <div class="field" style="flex:0"><button class="btn btn-primary" onclick="addRoom()">+ Tambah Ruangan</button></div>
+    </div>
+    <div style="margin-top:16px">`;
+  if (!rooms.length) {
+    html += `<div class="empty">Belum ada ruangan.</div>`;
+  } else {
+    rooms.forEach(r => {
+      const rParams = params.filter(p => p.roomId === r.id);
+      const isOpen = openRoomId === r.id;
+      const isQAroom = upper(r.area) === 'QA';
+      html += `<div class="room-block">
+        <div class="room-head" onclick="toggleRoomPanel('${r.id}')">
+          <div class="left">
+            <span class="chev ${isOpen ? 'open' : ''}">▶</span>
+            <b>${esc(r.nomor)}</b>
+            <span class="badge-area ${isQAroom ? 'qa' : ''}">${esc(r.area)}</span>
+            <span style="font-size:12px;color:#64748b;font-weight:600">${rParams.length} parameter</span>
+          </div>
+          <div class="right" onclick="event.stopPropagation()">
+            <button class="btn btn-edit btn-sm" onclick="editRoom('${r.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="delRoom('${r.id}')">Delete</button>
+          </div>
+        </div>
+        <div class="room-body ${isOpen ? '' : 'hidden'}">
+          <h4>Parameter Ruangan ${esc(r.nomor)}</h4>
+          <div class="form-row">
+            <div class="field"><label>Nama</label><input id="p-nama-${r.id}" placeholder="NAMA" style="text-transform:uppercase"></div>
+            <div class="field"><label>Satuan</label>
+              <input id="p-satuan-${r.id}" list="satuanList-${r.id}" placeholder="SATUAN">
+              <datalist id="satuanList-${r.id}"><option value="°C"><option value="%"><option value="PA"></datalist>
+            </div>
+            <div class="field" style="max-width:110px"><label>Min</label><input type="number" step="any" id="p-min-${r.id}" placeholder="0"></div>
+            <div class="field" style="max-width:110px"><label>Max</label><input type="number" step="any" id="p-max-${r.id}" placeholder="0"></div>
+            <div class="field" style="flex:0"><button class="btn btn-primary" onclick="addParam('${r.id}')">+ Tambah</button></div>
+          </div>
+          <table style="margin-top:12px"><thead><tr><th>Nama</th><th>Satuan</th><th>Min</th><th>Max</th><th>Syarat</th><th>Aksi</th></tr></thead><tbody>`;
+      if (!rParams.length) html += `<tr><td colspan="6" class="empty">Belum ada parameter</td></tr>`;
+      rParams.forEach(p => {
+        html += `<tr>
+          <td><b>${esc(p.nama)}</b></td><td>${esc(p.satuan)}</td><td>${esc(p.min)}</td><td>${esc(p.max)}</td>
+          <td>${esc(p.min)} – ${esc(p.max)} ${esc(p.satuan)}</td>
+          <td><button class="btn btn-edit btn-sm" onclick="editParam('${p.id}')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="delParam('${p.id}')">Delete</button></td></tr>`;
+      });
+      html += `</tbody></table></div></div>`;
+    });
+  }
+  html += `</div></div>`;
+  document.getElementById('tab-management').innerHTML = html;
+}
+
+function toggleRoomPanel(roomId) {
+  openRoomId = openRoomId === roomId ? null : roomId;
+  renderManagement();
+}
+
+/* USER CRUD */
+function addUser() {
+  const nik = upper(document.getElementById('u-nik').value);
+  const inisial = upper(document.getElementById('u-inisial').value);
+  const dept = upper(document.getElementById('u-dept').value);
+  if (!nik || !inisial) return toast('NIK dan Inisial wajib diisi', true);
+  if (!DEPARTMENTS.includes(dept)) return toast('Departemen tidak valid', true);
+  const users = getUsers();
+  if (users.some(u => upper(u.nik) === nik)) return toast('NIK sudah terdaftar', true);
+  users.push({ id: genId(), nik, inisial, dept });
+  save(LS.users, users); toast('User ditambahkan'); renderManagement();
+}
+function editUser(id) {
+  const users = getUsers();
+  const u = users.find(x => x.id === id); if (!u) return;
+  openModal({
+    title: 'Edit User', icon: '👤',
+    bodyHTML: mField('NIK', 'm-u-nik', u.nik, { uppercase: true })
+      + mField('Inisial', 'm-u-inisial', u.inisial, { uppercase: true })
+      + `<div class="field"><label>Departemen</label>
+          <select id="m-u-dept">${DEPARTMENTS.map(d => `<option ${d===u.dept?'selected':''}>${d}</option>`).join('')}</select></div>`,
+    okText: 'Simpan',
+    onOk: () => {
+      const nik = upper(document.getElementById('m-u-nik').value);
+      const inisial = upper(document.getElementById('m-u-inisial').value);
+      const dept = upper(document.getElementById('m-u-dept').value);
+      if (!nik) return modalError('NIK tidak boleh kosong');
+      if (!inisial) return modalError('Inisial tidak boleh kosong');
+      if (!DEPARTMENTS.includes(dept)) return modalError('Departemen tidak valid');
+      if (users.some(x => x.id !== id && upper(x.nik) === nik)) return modalError('NIK sudah dipakai user lain');
+      u.nik = nik; u.inisial = inisial; u.dept = dept;
+      save(LS.users, users); closeModal(); toast('User diperbarui'); renderManagement();
+    }
+  });
+}
+function delUser(id) {
+  showConfirm('Hapus User', 'Yakin ingin menghapus user ini?', () => {
+    save(LS.users, getUsers().filter(u => u.id !== id));
+    toast('User dihapus'); renderManagement();
+  });
+}
+
+/* ROOM CRUD */
+function addRoom() {
+  const nomor = upper(document.getElementById('r-nomor').value);
+  const area = upper(document.getElementById('r-area').value);
+  if (!nomor) return toast('Nomor ruangan wajib diisi', true);
+  if (!AREAS.includes(area)) return toast('Area tidak valid', true);
+  const rooms = getRooms();
+  if (rooms.some(r => upper(r.nomor) === nomor)) return toast('Nomor ruangan sudah ada', true);
+  rooms.push({ id: genId(), nomor, area });
+  save(LS.rooms, rooms); toast('Ruangan ditambahkan'); renderManagement();
+}
+function editRoom(id) {
+  const rooms = getRooms();
+  const r = rooms.find(x => x.id === id); if (!r) return;
+  openModal({
+    title: 'Edit Ruangan', icon: '🏢',
+    bodyHTML: mField('Nomor Ruangan', 'm-r-nomor', r.nomor, { uppercase: true })
+      + `<div class="field"><label>Area</label>
+          <select id="m-r-area">${AREAS.map(a => `<option ${a===r.area?'selected':''}>${a}</option>`).join('')}</select></div>`,
+    okText: 'Simpan',
+    onOk: () => {
+      const nomor = upper(document.getElementById('m-r-nomor').value);
+      const area = upper(document.getElementById('m-r-area').value);
+      if (!nomor) return modalError('Nomor ruangan tidak boleh kosong');
+      if (!AREAS.includes(area)) return modalError('Area tidak valid');
+      if (rooms.some(x => x.id !== id && upper(x.nomor) === nomor)) return modalError('Nomor ruangan sudah ada');
+      r.nomor = nomor; r.area = area;
+      save(LS.rooms, rooms); closeModal(); toast('Ruangan diperbarui'); renderManagement();
+    }
+  });
+}
+function delRoom(id) {
+  showConfirm('Hapus Ruangan', 'Hapus ruangan ini? Parameter ruangan ini juga akan terhapus.', () => {
+    save(LS.rooms, getRooms().filter(r => r.id !== id));
+    save(LS.params, getParams().filter(p => p.roomId !== id));
+    if (openRoomId === id) openRoomId = null;
+    toast('Ruangan & parameternya dihapus'); renderManagement();
+  });
+}
+
+/* PARAM CRUD */
+function addParam(roomId) {
+  const nama = upper(document.getElementById('p-nama-' + roomId).value);
+  const satuan = document.getElementById('p-satuan-' + roomId).value.trim();
+  const min = document.getElementById('p-min-' + roomId).value;
+  const max = document.getElementById('p-max-' + roomId).value;
+  if (!nama || !satuan) return toast('Nama & satuan wajib diisi', true);
+  if (min === '' || max === '') return toast('Min & max wajib diisi', true);
+  if (Number(min) > Number(max)) return toast('Min tidak boleh lebih besar dari Max', true);
+  const params = getParams();
+  if (params.some(p => p.roomId === roomId && upper(p.nama) === nama))
+    return toast('Nama parameter sudah ada di ruangan ini', true);
+  params.push({ id: genId(), roomId, nama, satuan, min: Number(min), max: Number(max) });
+  save(LS.params, params); toast('Parameter ditambahkan'); renderManagement();
+}
+function editParam(id) {
+  const params = getParams();
+  const p = params.find(x => x.id === id); if (!p) return;
+  openModal({
+    title: 'Edit Parameter', icon: '📐',
+    bodyHTML: mField('Nama Parameter', 'm-p-nama', p.nama, { uppercase: true })
+      + `<div class="field"><label>Satuan</label>
+          <input id="m-p-satuan" value="${esc(p.satuan)}" list="m-satuanList">
+          <datalist id="m-satuanList"><option value="°C"><option value="%"><option value="PA"></datalist></div>`
+      + `<div style="display:flex;gap:12px">
+          ${mField('Min', 'm-p-min', p.min, { type: 'number', step: 'any' })}
+          ${mField('Max', 'm-p-max', p.max, { type: 'number', step: 'any' })}
+        </div>`,
+    okText: 'Simpan',
+    onOk: () => {
+      const nama = upper(document.getElementById('m-p-nama').value);
+      const satuan = document.getElementById('m-p-satuan').value.trim();
+      const min = Number(document.getElementById('m-p-min').value);
+      const max = Number(document.getElementById('m-p-max').value);
+      if (!nama) return modalError('Nama tidak boleh kosong');
+      if (!satuan) return modalError('Satuan tidak boleh kosong');
+      if (Number.isNaN(min) || Number.isNaN(max)) return modalError('Min/Max harus angka');
+      if (min > max) return modalError('Min tidak boleh lebih besar dari Max');
+      if (params.some(x => x.id !== id && x.roomId === p.roomId && upper(x.nama) === nama))
+        return modalError('Nama parameter sudah ada di ruangan ini');
+      p.nama = nama; p.satuan = satuan; p.min = min; p.max = max;
+      save(LS.params, params); closeModal(); toast('Parameter diperbarui'); renderManagement();
+    }
+  });
+}
+function delParam(id) {
+  showConfirm('Hapus Parameter', 'Hapus parameter ini?', () => {
+    save(LS.params, getParams().filter(p => p.id !== id));
+    toast('Parameter dihapus'); renderManagement();
+  });
+}
+
+document.getElementById('loginNik').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
