@@ -562,7 +562,6 @@ const parseWaktu = str => {
 /* ================= DUMMY DATA GENERATOR ================= */
 function rnd(min, max) { return Math.random() * (max - min) + min; }
 function rndInt(min, max) { return Math.floor(rnd(min, max + 1)); }
-function pick(arr) { return arr[rndInt(0, arr.length - 1)]; }
 
 function generateDummyRecords(rooms, params, users) {
   const now = new Date();
@@ -570,11 +569,10 @@ function generateDummyRecords(rooms, params, users) {
   const month = now.getMonth() + 1;
   const daysInMonth = new Date(year, month, 0).getDate();
 
-  // petugas per area
   const petugasByArea = {};
   users.forEach(u => {
     const d = upper(u.dept);
-    if (d === 'QA') return; // QA tidak input
+    if (d === 'QA') return;
     if (!petugasByArea[d]) petugasByArea[d] = [];
     petugasByArea[d].push(u);
   });
@@ -590,10 +588,8 @@ function generateDummyRecords(rooms, params, users) {
     const petugas = petugasArr.length ? petugasArr[0] : users[0];
 
     for (let d = 1; d <= daysInMonth; d++) {
-      // skip sebagian hari secara acak untuk variasi (tapi mayoritas diisi)
       SHIFTS.forEach((sh, si) => {
-        // ~92% slot terisi, sisanya kosong
-        if (Math.random() < 0.08) return;
+        if (Math.random() < 0.08) return; // ~8% slot kosong
 
         const values = [];
         let anyNg = false;
@@ -601,17 +597,14 @@ function generateDummyRecords(rooms, params, users) {
         rParams.forEach(p => {
           const minV = Number(p.min), maxV = Number(p.max);
           const range = maxV - minV;
-          // 85% dalam standar, 15% NG
           let num;
           if (Math.random() < 0.15) {
-            // keluar standar
             if (Math.random() < 0.5) num = minV - range * rnd(0.02, 0.15);
             else num = maxV + range * rnd(0.02, 0.15);
           } else {
             num = minV + range * rnd(0.1, 0.9);
           }
 
-          // pembulatan sesuai besaran
           if (range >= 1000) num = Math.round(num);
           else if (range >= 100) num = Math.round(num * 10) / 10;
           else num = Math.round(num * 10) / 10;
@@ -627,18 +620,10 @@ function generateDummyRecords(rooms, params, users) {
         const waktu = `${String(d).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}, ${String(hh).padStart(2,'0')}.${String(mm).padStart(2,'0')}.${String(ss).padStart(2,'0')}`;
 
         recs.push({
-          id: genId(),
-          no: no++,
-          waktu,
-          shift: sh,
-          roomId: room.id,
-          roomNomor: room.nomor,
-          area: room.area,
-          nik: petugas.nik,
-          inisial: petugas.inisial,
-          dept: petugas.dept,
-          values,
-          status: anyNg ? 'NG' : 'OK'
+          id: genId(), no: no++, waktu, shift: sh,
+          roomId: room.id, roomNomor: room.nomor, area: room.area,
+          nik: petugas.nik, inisial: petugas.inisial, dept: petugas.dept,
+          values, status: anyNg ? 'NG' : 'OK'
         });
       });
     }
@@ -649,7 +634,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v11_dummy';
+  const marker = 'me_seed_v12_excel';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -683,12 +668,10 @@ function seed(force) {
   ];
   save(LS.params, params);
 
-  // generate dummy records untuk bulan berjalan
   const { records, nextNo } = generateDummyRecords(rooms, params, users);
   save(LS.records, records);
   save(LS.seq, { no: nextNo });
   storage.setItem(marker, '1');
-  console.log(`Seed dummy: ${records.length} records, ${nextNo - 1} pemantauan`);
 }
 seed(false);
 
@@ -882,7 +865,7 @@ function renderDashboard() {
     <div class="dept-info ${superAdmin ? 'super' : ''}">
       ${superAdmin ? '👑 Super Admin — Semua Area' : '🏷️ Area terkunci: ' + esc(myDept)}
     </div>
-    ${superAdmin ? `<button class="btn btn-export" onclick="exportCSV()">⬇️ Export Data (CSV)</button>` : ''}
+    ${superAdmin ? `<button class="btn btn-export" onclick="exportExcel()">⬇️ Export Data (Excel)</button>` : ''}
   </div>
 
   <div class="kpi-row">
@@ -1081,8 +1064,8 @@ function buildMonthOptions(selYear, selMonth) {
   return opts.join('');
 }
 
-/* ================= EXPORT CSV (QA only) ================= */
-function exportCSV() {
+/* ================= EXPORT EXCEL (XML Spreadsheet 2003) ================= */
+function exportExcel() {
   if (!isSuperAdmin(session)) return;
   const [yStr, mStr] = (window.__dashMonth || '').split('-');
   const year = Number(yStr), month = Number(mStr);
@@ -1094,35 +1077,71 @@ function exportCSV() {
   if (!recs.length) return toast('Tidak ada data untuk diekspor di bulan ini', true);
 
   const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Min','Max','Status'];
-  const rows = [header];
+  
+  // Format XML untuk Excel
+  const xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="header">
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#2563EB" ss:Pattern="Solid"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Pemantauan">
+  <Table>
+   <Row>`;
+  
+  // Header row
+  header.forEach(h => {
+    xml += `<Cell ss:StyleID="header"><Data ss:Type="String">${esc(h)}</Data></Cell>`;
+  });
+  xml += `</Row>`;
+
+  // Data rows
   recs.slice().sort((a, b) => a.no - b.no).forEach(r => {
     const d = parseWaktu(r.waktu);
     const tgl = d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
     r.values.forEach(v => {
-      rows.push([r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, v.value, v.satuan, v.min, v.max, v.ok?'OK':'NG']);
+      const row = [r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, v.value, v.satuan, v.min, v.max, v.ok?'OK':'NG'];
+      xml += `<Row>`;
+      row.forEach(c => {
+        const isNum = typeof c === 'number';
+        xml += `<Cell><Data ss:Type="${isNum ? 'Number' : 'String'}">${esc(c)}</Data></Cell>`;
+      });
+      xml += `</Row>`;
     });
   });
 
-  const csvEsc = v => {
-    const s = String(v ?? '');
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
-  const csv = rows.map(r => r.map(csvEsc).join(',')).join('\r\n');
+  xml += `  </Table>
+ </Worksheet>
+</Workbook>`;
 
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const fname = `monitoring-environment_${year}-${String(month).padStart(2,'0')}.csv`;
+  const fname = `monitoring-environment_${year}-${String(month).padStart(2,'0')}.xls`;
   a.download = fname;
   a.style.display = 'none';
   document.body.appendChild(a);
   try {
     a.click();
-    toast(`Export ${rows.length - 1} baris → ${fname}`);
+    toast(`Export ${recs.length} pemantauan → ${fname}`);
   } catch (e) {
-    toast('Download diblok sandbox — CSV di console', true);
-    console.log('CSV:\n', csv);
+    toast('Download diblok sandbox', true);
+    console.log('XML Excel:\n', xml);
   }
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
 }
