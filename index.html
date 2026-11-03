@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monitoring Environment</title>
+<!-- Library SheetJS untuk baca Excel asli -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -127,11 +129,14 @@
     background: #0f172a; padding: 0 6px; text-transform: uppercase; letter-spacing: 1px;
   }
   .err { color: #f87171; font-size: 13px; margin-bottom: 12px; min-height: 18px; font-weight: 600; }
+  
+  /* Tombol Login & Register */
+  .btn-container { display: flex; gap: 10px; margin-top: 10px; }
   .btn-main {
-    width: 100%; padding: 16px; border: none; border-radius: 12px;
+    flex: 1; padding: 16px; border: none; border-radius: 12px;
     background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: inherit; position: relative; overflow: hidden;
-    transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(37,99,235,.4); margin-top: 10px;
+    transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(37,99,235,.4);
   }
   .btn-main::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -140,6 +145,14 @@
   .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(37,99,235,.6); }
   .btn-main:hover::before { left: 100%; }
   .btn-main:active { transform: translateY(0); }
+  
+  .btn-reg {
+    flex: 1; padding: 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px;
+    background: transparent; color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: all 0.3s ease;
+  }
+  .btn-reg:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+
   .hint {
     margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08);
     font-size: 12.5px; color: #64748b; line-height: 1.8;
@@ -149,13 +162,6 @@
     background: rgba(59,130,246,.15); padding: 3px 8px; border-radius: 6px;
     color: #93c5fd; font-weight: 700; font-family: 'Courier New', monospace; border: 1px solid rgba(59,130,246,.2);
   }
-  .btn-reset {
-    margin-top: 12px; background: rgba(255,255,255,.05); color: #cbd5e1;
-    border: 1px solid rgba(255,255,255,.1); padding: 8px 16px;
-    border-radius: 8px; font-size: 12px; cursor: pointer;
-    font-family: inherit; font-weight: 600; transition: all 0.2s;
-  }
-  .btn-reset:hover { background: rgba(255,255,255,.1); color: #fff; }
 
   /* APP SHELL */
   header.topbar {
@@ -489,7 +495,8 @@
 
   /* Styling spesifik untuk input Min/Max yang banyak (Spec, Alert, Action) */
   .param-group-title { font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px; }
-  .param-limits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .param-limits-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .param-limit-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 </style>
 </head>
 <body>
@@ -512,7 +519,10 @@
     
     <div class="err" id="loginErr"></div>
     
-    <button class="btn-main" onclick="doLogin()">Masuk ke Sistem</button>
+    <div class="btn-container">
+      <button class="btn-main" onclick="doLogin()">Login</button>
+      <button class="btn-reg" onclick="openRegisterModal()">Register</button>
+    </div>
     
     <div class="hint">
       <b>NIK default untuk coba:</b><br>
@@ -703,7 +713,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v24_excel_ultimate';
+  const marker = 'me_seed_v25_excel_fix';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -815,7 +825,7 @@ function mField(label, id, value, opts = {}) {
   </div>`;
 }
 
-/* ================= SESSION ================= */
+/* ================= SESSION & REGISTER ================= */
 let session = null;
 function doLogin() {
   const nik = upper(document.getElementById('loginNik').value);
@@ -826,6 +836,41 @@ function doLogin() {
   session = user; save(LS.session, user);
   err.textContent = ''; enterApp();
 }
+
+function openRegisterModal() {
+  openModal({
+    title: 'Register User Baru', subtitle: 'Daftar Akun', icon: '👤',
+    bodyHTML: `
+      <div class="field"><label>NIK</label><input id="reg-nik" placeholder="Masukkan NIK" style="text-transform:uppercase"></div>
+      <div class="field"><label>Inisial</label><input id="reg-inisial" placeholder="Masukkan Inisial" style="text-transform:uppercase"></div>
+      <div class="field"><label>Departemen</label>
+        <select id="reg-dept">${DEPARTMENTS.map(d => `<option>${d}</option>`).join('')}</select>
+      </div>
+    `,
+    okText: 'Daftar & Masuk',
+    onOk: () => {
+      const nik = upper(document.getElementById('reg-nik').value);
+      const inisial = upper(document.getElementById('reg-inisial').value);
+      const dept = upper(document.getElementById('reg-dept').value);
+      
+      if (!nik || !inisial) return modalError('NIK dan Inisial wajib diisi');
+      
+      const users = getUsers();
+      if (users.some(u => upper(u.nik) === nik)) return modalError('NIK sudah terdaftar');
+      
+      const newUser = { id: genId(), nik, inisial, dept };
+      users.push(newUser);
+      save(LS.users, users);
+      
+      session = newUser;
+      save(LS.session, newUser);
+      
+      closeModal();
+      enterApp();
+    }
+  });
+}
+
 function doLogout() {
   session = null; storage.removeItem(LS.session);
   document.getElementById('appPage').classList.add('hidden');
@@ -1605,12 +1650,12 @@ function renderManagement() {
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-export" onclick="downloadTemplateParam()">⬇️ Download Template Excel</button>
       <div class="field" style="flex:1; min-width:200px; margin:0;">
-        <input type="file" id="uploadParamFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="padding:8px; border:1px solid #86efac; background:#fff;">
+        <input type="file" id="uploadParamFile" accept=".xls, .xlsx" style="padding:8px; border:1px solid #86efac; background:#fff;">
       </div>
       <button class="btn btn-primary" onclick="uploadParamData()">🚀 Upload & Simpan</button>
     </div>
     <p style="font-size:12px; color:#166534; margin-top:10px;">
-      *Download template Excel (.xls), isi data parameter, simpan sebagai <b>CSV (Comma Delimited)</b>, lalu upload. Sistem otomatis parsing format tersebut.
+      *Hanya menerima file <b>.xls atau .xlsx</b>. Download template, isi datanya, simpan sebagai Excel, lalu upload.
     </p>
   </div>`;
 
@@ -1673,33 +1718,29 @@ function renderManagement() {
           <div class="card" style="background:#f8fafc; border:1px solid #e2e8f0; margin-bottom:16px; padding:14px;">
             <div style="font-size:12px; font-weight:800; margin-bottom:10px;">Tambah Parameter Baru</div>
             <div class="form-row" style="margin-bottom:8px;">
-              <div class="field"><label>Nama</label><input id="p-nama-${r.id}" placeholder="NAMA" style="text-transform:uppercase"></div>
-              <div class="field"><label>Satuan</label>
-                <input id="p-satuan-${r.id}" list="satuanList-${r.id}" placeholder="SATUAN">
-                <datalist id="satuanList-${r.id}"><option value="°C"><option value="%"><option value="PA"></datalist>
-              </div>
+              <div class="field"><label>Nama Parameter</label><input id="p-nama-${r.id}" placeholder="NAMA" style="text-transform:uppercase"></div>
             </div>
+            
             <div class="param-limits-grid">
-              <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
-                <label style="color:#16a34a">SPEC (Hijau)</label>
-                <div style="display:flex; gap:8px;">
-                   <input type="number" step="any" id="p-min-spec-${r.id}" placeholder="Min Spec" style="flex:1">
-                   <input type="number" step="any" id="p-max-spec-${r.id}" placeholder="Max Spec" style="flex:1">
-                </div>
+              <div class="param-group-title" style="color:#16a34a">SPEC (Hijau)</div>
+              <div class="param-limit-row">
+                <div class="field"><label>Min</label><input type="number" step="any" id="p-min-spec-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Max</label><input type="number" step="any" id="p-max-spec-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Satuan</label><input id="p-satuan-spec-${r.id}" placeholder="°C" oninput="syncSatuan('${r.id}', 'spec')"></div>
               </div>
-              <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
-                <label style="color:#eab308">ALERT (Kuning)</label>
-                <div style="display:flex; gap:8px;">
-                   <input type="number" step="any" id="p-min-alert-${r.id}" placeholder="Min Alert" style="flex:1">
-                   <input type="number" step="any" id="p-max-alert-${r.id}" placeholder="Max Alert" style="flex:1">
-                </div>
+              
+              <div class="param-group-title" style="color:#eab308">ALERT (Kuning)</div>
+              <div class="param-limit-row">
+                <div class="field"><label>Min</label><input type="number" step="any" id="p-min-alert-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Max</label><input type="number" step="any" id="p-max-alert-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Satuan</label><input id="p-satuan-alert-${r.id}" placeholder="°C" oninput="syncSatuan('${r.id}', 'alert')"></div>
               </div>
-              <div class="field" style="grid-column: span 2;">
-                <label style="color:#dc2626">ACTION (Merah)</label>
-                <div style="display:flex; gap:8px;">
-                   <input type="number" step="any" id="p-min-action-${r.id}" placeholder="Min Action" style="flex:1">
-                   <input type="number" step="any" id="p-max-action-${r.id}" placeholder="Max Action" style="flex:1">
-                </div>
+              
+              <div class="param-group-title" style="color:#dc2626">ACTION (Merah)</div>
+              <div class="param-limit-row">
+                <div class="field"><label>Min</label><input type="number" step="any" id="p-min-action-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Max</label><input type="number" step="any" id="p-max-action-${r.id}" placeholder="0"></div>
+                <div class="field"><label>Satuan</label><input id="p-satuan-action-${r.id}" placeholder="°C" oninput="syncSatuan('${r.id}', 'action')"></div>
               </div>
             </div>
             <button class="btn btn-primary" style="margin-top:12px; width:100%;" onclick="addParam('${r.id}')">+ Tambah Parameter</button>
@@ -1721,6 +1762,21 @@ function renderManagement() {
   }
   html += `</div></div>`;
   document.getElementById('tab-management').innerHTML = html;
+}
+
+// Fungsi bantu biar pas ngetik satuan di salah satu, yang lain ngikut
+function syncSatuan(roomId, source) {
+  const val = document.getElementById('p-satuan-' + source + '-' + roomId).value;
+  if (source === 'spec') {
+    document.getElementById('p-satuan-alert-' + roomId).value = val;
+    document.getElementById('p-satuan-action-' + roomId).value = val;
+  } else if (source === 'alert') {
+    document.getElementById('p-satuan-spec-' + roomId).value = val;
+    document.getElementById('p-satuan-action-' + roomId).value = val;
+  } else if (source === 'action') {
+    document.getElementById('p-satuan-spec-' + roomId).value = val;
+    document.getElementById('p-satuan-alert-' + roomId).value = val;
+  }
 }
 
 function toggleRoomPanel(roomId) {
@@ -1810,7 +1866,8 @@ function delRoom(id) {
 
 function addParam(roomId) {
   const nama = upper(document.getElementById('p-nama-' + roomId).value);
-  const satuan = document.getElementById('p-satuan-' + roomId).value.trim();
+  const satuan = document.getElementById('p-satuan-spec-' + roomId).value.trim(); // Ambil dari spec (karena udah disync)
+  
   const minSpec = Number(document.getElementById('p-min-spec-' + roomId).value);
   const maxSpec = Number(document.getElementById('p-max-spec-' + roomId).value);
   const minAlert = Number(document.getElementById('p-min-alert-' + roomId).value);
@@ -1823,7 +1880,6 @@ function addParam(roomId) {
     return toast('Semua batas Min/Max Spec, Alert, Action wajib diisi angka', true);
   }
   
-  // Validasi urutan: Action < Alert < Spec < Spec < Alert < Action
   if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
     return toast('Urutan batas salah! Harus: Min Action <= Min Alert <= Min Spec <= Max Spec <= Max Alert <= Max Action', true);
   }
@@ -1842,36 +1898,33 @@ function editParam(id) {
   openModal({
     title: 'Edit Parameter', icon: '📐', wide: true,
     bodyHTML: mField('Nama Parameter', 'm-p-nama', p.nama, { uppercase: true })
-      + `<div class="field"><label>Satuan</label>
-          <input id="m-p-satuan" value="${esc(p.satuan)}" list="m-satuanList">
-          <datalist id="m-satuanList"><option value="°C"><option value="%"><option value="PA"></datalist></div>`
       + `<div class="param-limits-grid" style="margin-top:10px;">
-          <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
-            <label style="color:#16a34a">SPEC (Hijau)</label>
-            <div style="display:flex; gap:8px;">
-               ${mField('Min Spec', 'm-p-min-spec', p.min_spec, { type: 'number', step: 'any' })}
-               ${mField('Max Spec', 'm-p-max-spec', p.max_spec, { type: 'number', step: 'any' })}
-            </div>
+          <div class="param-group-title" style="color:#16a34a">SPEC (Hijau)</div>
+          <div class="param-limit-row">
+            ${mField('Min Spec', 'm-p-min-spec', p.min_spec, { type: 'number', step: 'any' })}
+            ${mField('Max Spec', 'm-p-max-spec', p.max_spec, { type: 'number', step: 'any' })}
+            ${mField('Satuan Spec', 'm-p-satuan-spec', p.satuan)}
           </div>
-          <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
-            <label style="color:#eab308">ALERT (Kuning)</label>
-            <div style="display:flex; gap:8px;">
-               ${mField('Min Alert', 'm-p-min-alert', p.min_alert, { type: 'number', step: 'any' })}
-               ${mField('Max Alert', 'm-p-max-alert', p.max_alert, { type: 'number', step: 'any' })}
-            </div>
+          
+          <div class="param-group-title" style="color:#eab308">ALERT (Kuning)</div>
+          <div class="param-limit-row">
+            ${mField('Min Alert', 'm-p-min-alert', p.min_alert, { type: 'number', step: 'any' })}
+            ${mField('Max Alert', 'm-p-max-alert', p.max_alert, { type: 'number', step: 'any' })}
+            ${mField('Satuan Alert', 'm-p-satuan-alert', p.satuan)}
           </div>
-          <div class="field" style="grid-column: span 2;">
-            <label style="color:#dc2626">ACTION (Merah)</label>
-            <div style="display:flex; gap:8px;">
-               ${mField('Min Action', 'm-p-min-action', p.min_action, { type: 'number', step: 'any' })}
-               ${mField('Max Action', 'm-p-max-action', p.max_action, { type: 'number', step: 'any' })}
-            </div>
+          
+          <div class="param-group-title" style="color:#dc2626">ACTION (Merah)</div>
+          <div class="param-limit-row">
+            ${mField('Min Action', 'm-p-min-action', p.min_action, { type: 'number', step: 'any' })}
+            ${mField('Max Action', 'm-p-max-action', p.max_action, { type: 'number', step: 'any' })}
+            ${mField('Satuan Action', 'm-p-satuan-action', p.satuan)}
           </div>
         </div>`,
     okText: 'Simpan',
     onOk: () => {
       const nama = upper(document.getElementById('m-p-nama').value);
-      const satuan = document.getElementById('m-p-satuan').value.trim();
+      const satuan = document.getElementById('m-p-satuan-spec').value.trim();
+      
       const minSpec = Number(document.getElementById('m-p-min-spec').value);
       const maxSpec = Number(document.getElementById('m-p-max-spec').value);
       const minAlert = Number(document.getElementById('m-p-min-alert').value);
@@ -2062,48 +2115,31 @@ function downloadTemplateParam() {
 
 function uploadParamData() {
   const fileInput = document.getElementById('uploadParamFile');
-  if (!fileInput.files || !fileInput.files[0]) return toast('Pilih file Excel/CSV terlebih dahulu', true);
+  if (!fileInput.files || !fileInput.files[0]) return toast('Pilih file Excel terlebih dahulu', true);
   
   const file = fileInput.files[0];
   const reader = new FileReader();
+  
   reader.onload = (ev) => {
     try {
-      let text = ev.target.result;
-      // 1. Bersihkan BOM (Byte Order Mark) jika file disimpan dari Excel
-      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      const data = new Uint8Array(ev.target.result);
+      // Baca pakai SheetJS
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      // Ubah ke array of arrays (tiap baris jadi array)
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
       
-      // 2. Pecah jadi baris, buang baris yang bener-bener kosong
-      const rawLines = text.split(/\r?\n/);
-      const lines = rawLines.filter(l => l.trim() !== '');
-      
-      // 3. Cari baris pertama yang diawali dengan "R-" atau teks lain (abaikan header)
-      let startIndex = 0;
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].toUpperCase().includes('R-') || (!isNaN(parseInt(lines[i][0])) && lines[i].length > 5)) {
-          startIndex = i;
-          break;
-        }
-      }
+      if (rows.length < 4) return toast('Format file tidak valid (minimal 4 baris)', true);
 
-      if (startIndex >= lines.length) return toast('Tidak ada data valid yang ditemukan di file.', true);
-
-      const dataLines = lines.slice(startIndex);
+      // Loop data mulai dari baris ke-4 (index 3)
+      const dataLines = rows.slice(3);
       let inserted = 0, updated = 0, skipped = 0;
 
       const rooms = getRooms();
       const params = getParams();
 
-      dataLines.forEach(line => {
-        // 4. Deteksi pemisah otomatis (Titik koma, Koma, atau Tab)
-        let delimiter = ',';
-        if (line.includes(';')) delimiter = ';';
-        else if (line.includes('\t')) delimiter = '\t';
-
-        // 5. Pecah kolom
-        const cols = line.split(delimiter).map(c => c.replace(/^"|"$/g, '').trim());
-        
-        // Minimal harus ada 9 kolom (Ruangan, Area, 6 batas suhu, Satuan suhu)
-        if (cols.length < 9) return;
+      dataLines.forEach(cols => {
+        if (!cols || cols.length < 9) return;
 
         const roomNum = upper(cols[0]);
         const area = upper(cols[1]);
@@ -2116,11 +2152,11 @@ function uploadParamData() {
           rooms.push(room);
         }
 
-        // 6. Ekstrak data berdasarkan index
-        // Index: 0 (Room), 1 (Area)
-        // SUHU: 2, 3, 4, 5, 6, 7 | Satuan: 8
-        // KELEMBABAN: 9, 10, 11, 12, 13, 14 | Satuan: 15
-        // TEKANAN: 16, 17, 18, 19, 20, 21 | Satuan: 22
+        // Mapping Index Excel:
+        // 0: Room, 1: Area
+        // SUHU: 2 (Spec Min), 3 (Spec Max), 4 (Alert Min), 5 (Alert Max), 6 (Action Min), 7 (Action Max), 8 (Satuan)
+        // KELEMBABAN: 9, 10, 11, 12, 13, 14, 15
+        // TEKANAN: 16, 17, 18, 19, 20, 21, 22
         const paramDefs = [
           { nama: 'SUHU', offset: 2 },
           { nama: 'KELEMBAPAN', offset: 9 },
@@ -2136,10 +2172,8 @@ function uploadParamData() {
           const maxAction = Number(cols[def.offset + 5]);
           const satuan = cols[def.offset + 6] || '';
 
-          // Validasi angka
           if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
           
-          // Validasi logika (Min Action <= Alert <= Spec <= Max Spec <= Alert <= Action)
           if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
             console.warn(`Urutan batas salah di ${roomNum} - ${def.nama}`);
             return; 
@@ -2161,19 +2195,16 @@ function uploadParamData() {
 
       save(LS.rooms, rooms);
       save(LS.params, params);
-      
-      if (inserted === 0 && updated === 0) {
-        toast('Data tidak valid / kolom tidak sesuai template.', true);
-      } else {
-        toast(`Upload berhasil: ${inserted} ditambah, ${updated} diupdate.`);
-      }
+      toast(`Upload selesai: ${inserted} param ditambah, ${updated} diupdate.`);
       renderManagement();
     } catch (err) {
       console.error(err);
-      toast('Gagal parsing file. Pastikan format sesuai.', true);
+      toast('Gagal parsing file. Pastikan format Excel sesuai template.', true);
     }
   };
-  reader.readAsText(file);
+  
+  // Baca file sebagai ArrayBuffer agar SheetJS bisa parsing .xls / .xlsx
+  reader.readAsArrayBuffer(file);
 }
 
 document.getElementById('loginNik').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
