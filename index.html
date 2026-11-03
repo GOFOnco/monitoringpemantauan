@@ -703,7 +703,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v21_excel_template';
+  const marker = 'me_seed_v22_excel_unit';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -1908,7 +1908,6 @@ function delParam(id) {
 
 /* ================= UPLOAD / DOWNLOAD TEMPLATE EXCEL ================= */
 function downloadTemplateParam() {
-  // Bikin Excel XML (SpreadsheetML) biar kolomnya rapi, ada merge cell, dan bisa langsung dibuka di Excel
   let xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
@@ -1966,30 +1965,32 @@ function downloadTemplateParam() {
    <Row>
     <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Nomor Ruangan</Data></Cell>
     <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Area</Data></Cell>
-    <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Satuan</Data></Cell>
-    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Suhu</Data></Cell>
-    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Kelembaban</Data></Cell>
-    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Tekanan Udara</Data></Cell>
+    <Cell ss:MergeAcross="6" ss:StyleID="header1"><Data ss:Type="String">Suhu</Data></Cell>
+    <Cell ss:MergeAcross="6" ss:StyleID="header1"><Data ss:Type="String">Kelembaban</Data></Cell>
+    <Cell ss:MergeAcross="6" ss:StyleID="header1"><Data ss:Type="String">Tekanan Udara</Data></Cell>
    </Row>
    
    <!-- BARIS 2: SUB HEADER (SPEC/ALERT/ACTION) -->
    <Row>
-    <Cell ss:Index="4" ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
+    <Cell ss:Index="3" ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+    <Cell ss:MergeDown="1" ss:StyleID="header2"><Data ss:Type="String">Satuan</Data></Cell>
     
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+    <Cell ss:MergeDown="1" ss:StyleID="header2"><Data ss:Type="String">Satuan</Data></Cell>
     
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+    <Cell ss:MergeDown="1" ss:StyleID="header2"><Data ss:Type="String">Satuan</Data></Cell>
    </Row>
 
    <!-- BARIS 3: SUB HEADER (MIN/MAX) -->
    <Row>
-    <Cell ss:Index="4" ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:Index="3" ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
     <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
     <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
     <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
@@ -2015,27 +2016,29 @@ function downloadTemplateParam() {
    <Row>
     <Cell><Data ss:Type="String">R-101</Data></Cell>
     <Cell><Data ss:Type="String">QC</Data></Cell>
-    <Cell><Data ss:Type="String">°C</Data></Cell>
     <Cell><Data ss:Type="Number">20</Data></Cell>
     <Cell><Data ss:Type="Number">24</Data></Cell>
     <Cell><Data ss:Type="Number">18</Data></Cell>
     <Cell><Data ss:Type="Number">26</Data></Cell>
     <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="Number">30</Data></Cell>
-    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">°C</Data></Cell>
+    
     <Cell><Data ss:Type="Number">45</Data></Cell>
     <Cell><Data ss:Type="Number">55</Data></Cell>
     <Cell><Data ss:Type="Number">40</Data></Cell>
     <Cell><Data ss:Type="Number">60</Data></Cell>
     <Cell><Data ss:Type="Number">30</Data></Cell>
     <Cell><Data ss:Type="Number">70</Data></Cell>
-    <Cell><Data ss:Type="String">PA</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    
     <Cell><Data ss:Type="Number">100500</Data></Cell>
     <Cell><Data ss:Type="Number">101500</Data></Cell>
     <Cell><Data ss:Type="Number">100000</Data></Cell>
     <Cell><Data ss:Type="Number">102000</Data></Cell>
     <Cell><Data ss:Type="Number">99000</Data></Cell>
     <Cell><Data ss:Type="Number">103000</Data></Cell>
+    <Cell><Data ss:Type="String">PA</Data></Cell>
    </Row>
   </Table>
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
@@ -2084,7 +2087,6 @@ function uploadParamData() {
 
         const roomNum = upper(clean[0]);
         const area = upper(clean[1]);
-        const satuan = clean[2];
 
         if (!roomNum || !area) { skipped++; return; }
 
@@ -2094,10 +2096,14 @@ function uploadParamData() {
           rooms.push(room);
         }
 
+        // Offset tiap parameter:
+        // SUHU (kolom index 2-8): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // KELEMBAPAN (kolom index 9-15): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // TEKANAN UDARA (kolom index 16-22): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
         const paramDefs = [
-          { nama: 'SUHU', offset: 3 },
-          { nama: 'KELEMBABAN', offset: 11 },
-          { nama: 'TEKANAN UDARA', offset: 19 }
+          { nama: 'SUHU', offset: 2 },
+          { nama: 'KELEMBAPAN', offset: 9 },
+          { nama: 'TEKANAN UDARA', offset: 16 }
         ];
 
         paramDefs.forEach(def => {
@@ -2107,6 +2113,7 @@ function uploadParamData() {
           const maxAlert = Number(clean[def.offset + 3]);
           const minAction = Number(clean[def.offset + 4]);
           const maxAction = Number(clean[def.offset + 5]);
+          const satuan = clean[def.offset + 6] || '';
 
           if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
           
