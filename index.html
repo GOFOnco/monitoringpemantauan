@@ -162,6 +162,13 @@
     background: rgba(59,130,246,.15); padding: 3px 8px; border-radius: 6px;
     color: #93c5fd; font-weight: 700; font-family: 'Courier New', monospace; border: 1px solid rgba(59,130,246,.2);
   }
+  .btn-reset {
+    margin-top: 12px; background: rgba(255,255,255,.05); color: #cbd5e1;
+    border: 1px solid rgba(255,255,255,.1); padding: 8px 16px;
+    border-radius: 8px; font-size: 12px; cursor: pointer;
+    font-family: inherit; font-weight: 600; transition: all 0.2s;
+  }
+  .btn-reset:hover { background: rgba(255,255,255,.1); color: #fff; }
 
   /* APP SHELL */
   header.topbar {
@@ -713,7 +720,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v25_excel_fix';
+  const marker = 'me_seed_v26_scorecard_update';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -932,10 +939,16 @@ function renderDashboard() {
     return true;
   });
 
+  // Hitung ulang status berdasarkan nilai TMS After (jika ada)
+  let okCount = 0, alertCount = 0, actionCount = 0;
+  monthRecs.forEach(rec => {
+    const finalStatus = getFinalStatus(rec);
+    if (finalStatus === 'OK') okCount++;
+    else if (finalStatus === 'ALERT') alertCount++;
+    else actionCount++;
+  });
+
   const filledCount = monthRecs.length;
-  const okCount = monthRecs.filter(r => r.status === 'OK').length;
-  const alertCount = monthRecs.filter(r => r.status === 'ALERT').length;
-  const actionCount = monthRecs.filter(r => r.status === 'ACTION').length;
   const pct = targetTotal > 0 ? Math.round((filledCount / targetTotal) * 100) : 0;
 
   const rooms = roomsInScope;
@@ -1064,12 +1077,10 @@ function renderDashboard() {
                 tdClass = 'fixed';
                 isTms = true;
               } else {
-                // Masih butuh After, warnanya tetap sesuai status aslinya
                 tdClass = valObj.status === 'OK' ? 'ok' : (valObj.status === 'ALERT' ? 'alert' : 'action');
               }
             }
 
-            // Klik hanya untuk Alert / Action
             if (tdClass === 'alert' || tdClass === 'action' || tdClass === 'fixed') {
                clickAttr = `onclick="handleTmsClick('${rec.id}', '${valObj.nama}')"`;
             }
@@ -1138,6 +1149,29 @@ function renderDashboard() {
   html += `</div></div>`;
 
   document.getElementById('tab-dashboard').innerHTML = html;
+}
+
+// Helper untuk dapetin status akhir dari record (prioritas TMS After)
+function getFinalStatus(rec) {
+  let hasAlert = false, hasAction = false;
+  rec.values.forEach(v => {
+    if (v.tms && v.tms.after) {
+      // Cek status berdasarkan nilai After
+      const p = getParams().find(x => x.roomId === rec.roomId && x.nama === v.nama);
+      if (p) {
+        const stat = checkStatus(v.tms.after.value, p);
+        if (stat === 'ALERT') hasAlert = true;
+        if (stat === 'ACTION') hasAction = true;
+      }
+    } else {
+      // Nilai Before
+      if (v.status === 'ALERT') hasAlert = true;
+      if (v.status === 'ACTION') hasAction = true;
+    }
+  });
+  if (hasAction) return 'ACTION';
+  if (hasAlert) return 'ALERT';
+  return 'OK';
 }
 
 /* ================= TOOLTIP TMS ================= */
@@ -1212,6 +1246,7 @@ function handleTmsClick(recId, paramName) {
           closeModal();
           toast('Bukti Before tersimpan. Silakan klik lagi untuk isi After.');
           renderDashboard();
+          renderInput();
         };
         reader.readAsDataURL(file);
       }
@@ -1243,6 +1278,7 @@ function handleTmsClick(recId, paramName) {
           closeModal();
           toast('TMS Selesai! Data matriks telah diperbarui.');
           renderDashboard();
+          renderInput();
         };
         reader.readAsDataURL(file);
       }
@@ -1434,20 +1470,34 @@ function renderInput() {
     html += `<div class="area-group"><h3>Area ${esc(area)}</h3><div class="scorecards">`;
     byArea[area].forEach(r => {
       const pcount = getParamsByRoom(r.id).length;
+      
+      // Ambil record hari ini, cek status akhir (after TMS jika ada)
       const shiftStatus = SHIFTS.map(sh => {
         const rec = getSlotRecord(r.id, sh, tk);
-        return { shift: sh, filled: !!rec, status: rec ? rec.status : '' };
+        let finalStatus = '';
+        if (rec) finalStatus = getFinalStatus(rec); // Fungsi yang udah update nilai after
+        return { shift: sh, filled: !!rec, status: finalStatus };
       });
+      
       const filledCount = shiftStatus.filter(s => s.filled).length;
       const isFull = filledCount === SHIFTS.length;
+      
       html += `<div class="scorecard ${isFull ? 'full' : ''}" onclick="openInputForm('${r.id}')">
         <div class="room">${esc(r.nomor)}</div>
         <div class="sub">${esc(r.area)}</div>
         <div class="pcount">${pcount} parameter · ${filledCount}/3 shift terisi</div>
         <div class="shift-status">
-          ${shiftStatus.map(s => `<div class="shift-chip ${s.filled ? 'filled' : ''} ${s.status === 'ALERT' ? 'alert' : s.status === 'ACTION' ? 'action' : ''}">
-            ${s.shift.split(' ')[1]}${s.filled ? ' ✓' : ''}
-          </div>`).join('')}
+          ${shiftStatus.map(s => {
+             // Warnai berdasarkan status akhir
+             let chipClass = s.filled ? 'filled' : '';
+             if (s.filled) {
+               if (s.status === 'ALERT') chipClass += ' alert';
+               else if (s.status === 'ACTION') chipClass += ' action';
+             }
+             return `<div class="shift-chip ${chipClass}">
+              ${s.shift.split(' ')[1]}${s.filled ? ' ✓' : ''}
+            </div>`;
+          }).join('')}
         </div>
       </div>`;
     });
@@ -1501,10 +1551,9 @@ function openInputForm(roomId) {
       if (Number.isNaN(num)) { row.classList.add('invalid'); return; }
       
       const stat = checkStatus(num, p);
-      // Warnai border input sesuai status
-      if (stat === 'ACTION') input.style.borderColor = '#fca5a5'; // Merah
-      else if (stat === 'ALERT') input.style.borderColor = '#fde047'; // Kuning
-      else input.style.borderColor = '#86efac'; // Hijau
+      if (stat === 'ACTION') input.style.borderColor = '#fca5a5';
+      else if (stat === 'ALERT') input.style.borderColor = '#fde047';
+      else input.style.borderColor = '#86efac';
     });
   });
 }
@@ -1866,7 +1915,7 @@ function delRoom(id) {
 
 function addParam(roomId) {
   const nama = upper(document.getElementById('p-nama-' + roomId).value);
-  const satuan = document.getElementById('p-satuan-spec-' + roomId).value.trim(); // Ambil dari spec (karena udah disync)
+  const satuan = document.getElementById('p-satuan-spec-' + roomId).value.trim();
   
   const minSpec = Number(document.getElementById('p-min-spec-' + roomId).value);
   const maxSpec = Number(document.getElementById('p-max-spec-' + roomId).value);
