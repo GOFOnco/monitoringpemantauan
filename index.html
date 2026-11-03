@@ -703,7 +703,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v20_upload_excel';
+  const marker = 'me_seed_v21_excel_template';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -1601,7 +1601,7 @@ function renderManagement() {
 
   // === UPLOAD PARAMETER SECTION ===
   html += `<div class="card" style="background: #f0fdf4; border-color: #86efac;">
-    <h3 style="font-size:15px;margin-bottom:14px;font-weight:800;color:#15803d">📥 Upload Master Data Parameter (Excel/CSV)</h3>
+    <h3 style="font-size:15px;margin-bottom:14px;font-weight:800;color:#15803d">📥 Upload Master Data Parameter (Excel)</h3>
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-export" onclick="downloadTemplateParam()">⬇️ Download Template Excel</button>
       <div class="field" style="flex:1; min-width:200px; margin:0;">
@@ -1610,7 +1610,7 @@ function renderManagement() {
       <button class="btn btn-primary" onclick="uploadParamData()">🚀 Upload & Simpan</button>
     </div>
     <p style="font-size:12px; color:#166534; margin-top:10px;">
-      *Download template, isi sesuai format, simpan sebagai CSV, lalu upload. Sistem akan otomatis mendeteksi kolom (Ruangan, Area, Satuan, Parameter, dll).
+      *Download template Excel (.xls), isi data parameter (Spec, Alert, Action, Min, Max), lalu upload. Sistem otomatis parsing format tersebut.
     </p>
   </div>`;
 
@@ -1908,31 +1908,158 @@ function delParam(id) {
 
 /* ================= UPLOAD / DOWNLOAD TEMPLATE EXCEL ================= */
 function downloadTemplateParam() {
-  const header1 = ['Nomor Ruangan', 'Area', 'Satuan', 'Suhu', '', '', '', '', '', '', 'Kelembaban', '', '', '', '', '', '', 'Tekanan Udara', '', '', '', '', '', ''];
-  const header2 = ['', '', '', 'Spec', '', 'Alert', '', 'Action', '', '', 'Spec', '', 'Alert', '', 'Action', '', '', 'Spec', '', 'Alert', '', 'Action', '', ''];
-  const header3 = ['', '', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', ''];
+  // Bikin Excel XML (SpreadsheetML) biar kolomnya rapi, ada merge cell, dan bisa langsung dibuka di Excel
+  let xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="header1">
+   <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#2563EB" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="header2">
+   <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#1E293B"/>
+   <Interior ss:Color="#DBEAFE" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="header3">
+   <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#1E293B"/>
+   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Template Parameter">
+  <Table>
+   <!-- BARIS 1: HEADER ATAS -->
+   <Row>
+    <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Nomor Ruangan</Data></Cell>
+    <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Area</Data></Cell>
+    <Cell ss:MergeDown="2" ss:StyleID="header1"><Data ss:Type="String">Satuan</Data></Cell>
+    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Suhu</Data></Cell>
+    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Kelembaban</Data></Cell>
+    <Cell ss:MergeAcross="5" ss:StyleID="header1"><Data ss:Type="String">Tekanan Udara</Data></Cell>
+   </Row>
+   
+   <!-- BARIS 2: SUB HEADER (SPEC/ALERT/ACTION) -->
+   <Row>
+    <Cell ss:Index="4" ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+    
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+    
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Spec</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Alert</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="header2"><Data ss:Type="String">Action</Data></Cell>
+   </Row>
 
-  // Contoh baris data
-  const example = ['R-101', 'QC', '°C', '20', '24', '18', '26', '15', '30', '%', '45', '55', '40', '60', '30', '70', 'PA', '100500', '101500', '100000', '102000', '99000', '103000', ''];
+   <!-- BARIS 3: SUB HEADER (MIN/MAX) -->
+   <Row>
+    <Cell ss:Index="4" ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Min</Data></Cell>
+    <Cell ss:StyleID="header3"><Data ss:Type="String">Max</Data></Cell>
+   </Row>
 
-  const csvContent = [header1, header2, header3, example]
-    .map(row => row.map(c => `"${c}"`).join(','))
-    .join('\n');
+   <!-- BARIS 4: CONTOH PENGISIAN -->
+   <Row>
+    <Cell><Data ss:Type="String">R-101</Data></Cell>
+    <Cell><Data ss:Type="String">QC</Data></Cell>
+    <Cell><Data ss:Type="String">°C</Data></Cell>
+    <Cell><Data ss:Type="Number">20</Data></Cell>
+    <Cell><Data ss:Type="Number">24</Data></Cell>
+    <Cell><Data ss:Type="Number">18</Data></Cell>
+    <Cell><Data ss:Type="Number">26</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">30</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="Number">45</Data></Cell>
+    <Cell><Data ss:Type="Number">55</Data></Cell>
+    <Cell><Data ss:Type="Number">40</Data></Cell>
+    <Cell><Data ss:Type="Number">60</Data></Cell>
+    <Cell><Data ss:Type="Number">30</Data></Cell>
+    <Cell><Data ss:Type="Number">70</Data></Cell>
+    <Cell><Data ss:Type="String">PA</Data></Cell>
+    <Cell><Data ss:Type="Number">100500</Data></Cell>
+    <Cell><Data ss:Type="Number">101500</Data></Cell>
+    <Cell><Data ss:Type="Number">100000</Data></Cell>
+    <Cell><Data ss:Type="Number">102000</Data></Cell>
+    <Cell><Data ss:Type="Number">99000</Data></Cell>
+    <Cell><Data ss:Type="Number">103000</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>`;
 
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'template_parameter.csv';
+  a.download = 'Template_Parameter_Excel.xls';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+  toast('Template Excel berhasil diunduh!');
 }
 
 function uploadParamData() {
   const fileInput = document.getElementById('uploadParamFile');
-  if (!fileInput.files || !fileInput.files[0]) return toast('Pilih file CSV terlebih dahulu', true);
+  if (!fileInput.files || !fileInput.files[0]) return toast('Pilih file Excel/CSV terlebih dahulu', true);
   
   const file = fileInput.files[0];
   const reader = new FileReader();
@@ -1942,8 +2069,7 @@ function uploadParamData() {
       const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
       if (lines.length < 4) return toast('Format file tidak valid (minimal 4 baris)', true);
 
-      // Asumsi baris ke-4 (index 3) adalah data (karena index 0,1,2 adalah header)
-      // Kita loop mulai index 3 untuk membaca baris data
+      // Asumsi baris ke-4 (index 3) adalah data pertama
       const dataLines = lines.slice(3);
       let inserted = 0, updated = 0, skipped = 0;
 
@@ -1951,11 +2077,9 @@ function uploadParamData() {
       const params = getParams();
 
       dataLines.forEach(line => {
-        // Parse CSV sederhana (abaikan quote complex)
         const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
         if (!cols || cols.length < 4) return;
 
-        // Bersihkan tanda kutip
         const clean = cols.map(c => c.replace(/^"|"$/g, '').trim());
 
         const roomNum = upper(clean[0]);
@@ -1964,24 +2088,16 @@ function uploadParamData() {
 
         if (!roomNum || !area) { skipped++; return; }
 
-        // Cari atau buat Room
         let room = rooms.find(r => upper(r.nomor) === roomNum);
         if (!room) {
           room = { id: genId(), nomor: roomNum, area: area };
           rooms.push(room);
         }
 
-        // Ekstrak data parameter dari kolom
-        // Mulai dari index 3, setiap parameter pakai 8 kolom (Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max) -> 6 angka, tapi di file lu formatnya:
-        // Nama Param | Spec Min | Spec Max | Alert Min | Alert Max | Action Min | Action Max
-        // Contoh: Suhu | 20 | 24 | 18 | 26 | 15 | 30
-        // Kita harus deteksi nama param dari header row (baris 1).
-        // Biar gampang, kita hardcode param yang mungkin ada.
-        
         const paramDefs = [
           { nama: 'SUHU', offset: 3 },
-          { nama: 'KELEMBABAN', offset: 11 }, // 3 + 8 = 11
-          { nama: 'TEKANAN UDARA', offset: 19 } // 11 + 8 = 19
+          { nama: 'KELEMBABAN', offset: 11 },
+          { nama: 'TEKANAN UDARA', offset: 19 }
         ];
 
         paramDefs.forEach(def => {
@@ -1992,16 +2108,13 @@ function uploadParamData() {
           const minAction = Number(clean[def.offset + 4]);
           const maxAction = Number(clean[def.offset + 5]);
 
-          // Skip jika kosong
           if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
           
-          // Validasi urutan
           if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
             console.warn(`Urutan batas salah di ${roomNum} - ${def.nama}`);
             return; 
           }
 
-          // Simpan param
           let p = params.find(x => x.roomId === room.id && x.nama === def.nama);
           if (p) {
             p.satuan = satuan;
