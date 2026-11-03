@@ -14,35 +14,21 @@
   }
   .hidden { display: none !important; }
 
-  /* ================= LOGIN PAGE (UPGRADED) ================= */
+  /* ================= LOGIN PAGE ================= */
   #loginPage {
     display: flex; align-items: center; justify-content: center;
-    min-height: 100vh;
-    background: #0f172a;
-    position: relative; overflow: hidden;
-    padding: 20px;
+    min-height: 100vh; background: #0f172a;
+    position: relative; overflow: hidden; padding: 20px;
   }
 
   /* Aurora blobs */
   .aurora {
     position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
-    animation: float 20s infinite alternate ease-in-out;
-    z-index: 0;
+    animation: float 20s infinite alternate ease-in-out; z-index: 0;
   }
-  .aurora-1 {
-    width: 500px; height: 500px; background: #2563eb;
-    top: -150px; left: -100px;
-  }
-  .aurora-2 {
-    width: 400px; height: 400px; background: #06b6d4;
-    bottom: -100px; right: -50px;
-    animation-delay: -5s; animation-duration: 25s;
-  }
-  .aurora-3 {
-    width: 300px; height: 300px; background: #a855f7;
-    top: 40%; left: 60%;
-    animation-delay: -10s; animation-duration: 30s;
-  }
+  .aurora-1 { width: 500px; height: 500px; background: #2563eb; top: -150px; left: -100px; }
+  .aurora-2 { width: 400px; height: 400px; background: #06b6d4; bottom: -100px; right: -50px; animation-delay: -5s; animation-duration: 25s; }
+  .aurora-3 { width: 300px; height: 300px; background: #a855f7; top: 40%; left: 60%; animation-delay: -10s; animation-duration: 30s; }
 
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
@@ -50,7 +36,6 @@
     100% { transform: translate(-30px, -20px) scale(0.9); }
   }
 
-  /* Grid overlay */
   #loginPage::before {
     content: ''; position: absolute; inset: 0;
     background-image:
@@ -62,35 +47,41 @@
     z-index: 1; pointer-events: none;
   }
 
-  /* Particles container */
-  #particles {
-    position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  }
+  /* Bubbles */
+  #particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .particle {
-    position: absolute; width: 4px; height: 4px; border-radius: 50%;
-    background: rgba(255,255,255,.7);
-    box-shadow: 0 0 10px 2px rgba(59,130,246,.6);
-    animation: particleFloat 15s infinite linear;
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(59,130,246,0.2) 60%, rgba(59,130,246,0));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(59, 130, 246, 0.5);
+    animation: bubbleFloat infinite ease-in-out; bottom: -50px; opacity: 0;
   }
-  @keyframes particleFloat {
-    0% { transform: translateY(100vh) scale(0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  .particle.cyan {
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(6,182,212,0.3) 60%, rgba(6,182,212,0));
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 25px rgba(6, 182, 212, 0.6);
+    border-color: rgba(6, 182, 212, 0.4);
+  }
+  .particle.purple {
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(168,85,247,0.3) 60%, rgba(168,85,247,0));
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 25px rgba(168, 85, 247, 0.6);
+    border-color: rgba(168, 85, 247, 0.4);
+  }
+
+  @keyframes bubbleFloat {
+    0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+    10% { opacity: 0.8; }
+    50% { transform: translate3d(30px, -50vh, 0) scale(1.1); }
+    90% { opacity: 0.8; }
+    100% { transform: translate3d(-30px, -110vh, 0) scale(0.9); opacity: 0; }
   }
 
   /* Login Box */
   .login-box {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 48px 42px;
-    border-radius: 24px;
-    width: 420px;
+    background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 48px 42px; border-radius: 24px; width: 420px;
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05) inset;
-    position: relative; z-index: 2;
-    animation: slideUp 0.7s cubic-bezier(.16,1,.3,1);
+    position: relative; z-index: 2; animation: slideUp 0.7s cubic-bezier(.16,1,.3,1);
   }
   @keyframes slideUp {
     from { transform: translateY(40px) scale(.95); opacity: 0; }
@@ -103,13 +94,11 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 36px; margin-bottom: 24px;
     box-shadow: 0 8px 30px rgba(59,130,246,.5);
-    animation: pulse 2.5s infinite;
-    position: relative;
+    animation: pulse 2.5s infinite; position: relative;
   }
   .login-logo::after {
     content: ''; position: absolute; inset: -4px; border-radius: 24px;
-    border: 2px solid rgba(59,130,246,.4);
-    animation: ripple 2.5s infinite;
+    border: 2px solid rgba(59,130,246,.4); animation: ripple 2.5s infinite;
   }
   @keyframes pulse {
     0%, 100% { transform: scale(1); box-shadow: 0 8px 30px rgba(59,130,246,.5); }
@@ -123,8 +112,7 @@
   .login-box h1 {
     font-size: 28px; margin-bottom: 8px;
     background: linear-gradient(135deg, #fff, #93c5fd);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     font-weight: 800; letter-spacing: -1px;
   }
   .login-box p { font-size: 14px; color: #94a3b8; margin-bottom: 32px; }
@@ -133,64 +121,48 @@
   .input-group label {
     position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
     font-size: 14px; color: #94a3b8; font-weight: 600;
-    pointer-events: none; transition: all 0.2s ease;
-    background: transparent; padding: 0 4px;
+    pointer-events: none; transition: all 0.2s ease; background: transparent; padding: 0 4px;
   }
   .input-group input {
-    width: 100%; padding: 16px 18px;
-    background: rgba(255,255,255,.03);
-    border: 2px solid rgba(255,255,255,.1);
-    border-radius: 12px;
-    font-size: 16px; color: #fff;
-    font-family: inherit; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
+    width: 100%; padding: 16px 18px; background: rgba(255,255,255,.03);
+    border: 2px solid rgba(255,255,255,.1); border-radius: 12px;
+    font-size: 16px; color: #fff; font-family: inherit; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; transition: all 0.3s ease;
   }
   .input-group input:focus {
-    outline: none; border-color: #3b82f6;
-    background: rgba(59,130,246,.1);
+    outline: none; border-color: #3b82f6; background: rgba(59,130,246,.1);
     box-shadow: 0 0 0 4px rgba(59,130,246,.2), 0 0 20px rgba(59,130,246,.3);
   }
-  /* Label animation ketika input focus atau ada isinya */
   .input-group input:focus + label,
   .input-group input:not(:placeholder-shown) + label {
-    top: 0; left: 14px;
-    font-size: 11px; color: #60a5fa;
-    background: #0f172a; padding: 0 6px;
-    text-transform: uppercase; letter-spacing: 1px;
+    top: 0; left: 14px; font-size: 11px; color: #60a5fa;
+    background: #0f172a; padding: 0 6px; text-transform: uppercase; letter-spacing: 1px;
   }
 
   .err { color: #f87171; font-size: 13px; margin-bottom: 12px; min-height: 18px; font-weight: 600; }
   
   .btn-main {
     width: 100%; padding: 16px; border: none; border-radius: 12px;
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-    color: #fff; font-size: 16px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    position: relative; overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(37,99,235,.4);
-    margin-top: 10px;
+    background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit; position: relative; overflow: hidden;
+    transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(37,99,235,.4); margin-top: 10px;
   }
   .btn-main::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
-    transition: left 0.5s ease;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent); transition: left 0.5s ease;
   }
   .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(37,99,235,.6); }
   .btn-main:hover::before { left: 100%; }
   .btn-main:active { transform: translateY(0); }
 
   .hint {
-    margin-top: 28px; padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,.08);
+    margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08);
     font-size: 12.5px; color: #64748b; line-height: 1.8;
   }
   .hint b { color: #cbd5e1; }
   .hint code {
     background: rgba(59,130,246,.15); padding: 3px 8px; border-radius: 6px;
-    color: #93c5fd; font-weight: 700; font-family: 'Courier New', monospace;
-    border: 1px solid rgba(59,130,246,.2);
+    color: #93c5fd; font-weight: 700; font-family: 'Courier New', monospace; border: 1px solid rgba(59,130,246,.2);
   }
   .btn-reset {
     margin-top: 12px; background: rgba(255,255,255,.05); color: #cbd5e1;
@@ -203,15 +175,10 @@
   /* APP SHELL */
   header.topbar {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: #fff; padding: 0 28px;
-    display: flex; align-items: center; justify-content: space-between; height: 64px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.15);
-    position: sticky; top: 0; z-index: 100;
+    color: #fff; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 64px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15); position: sticky; top: 0; z-index: 100;
   }
-  header.topbar .brand {
-    display: flex; align-items: center; gap: 12px;
-    font-weight: 800; font-size: 16px; letter-spacing: .3px;
-  }
+  header.topbar .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 16px; letter-spacing: .3px; }
   header.topbar .brand .dot {
     width: 32px; height: 32px; border-radius: 9px;
     background: linear-gradient(135deg, #2563eb, #06b6d4);
@@ -225,10 +192,7 @@
     padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 11.5px;
     letter-spacing: .4px; box-shadow: 0 2px 8px rgba(59,130,246,.4);
   }
-  header.topbar .badge.super {
-    background: linear-gradient(135deg, #a855f7, #ec4899);
-    box-shadow: 0 2px 8px rgba(168,85,247,.45);
-  }
+  header.topbar .badge.super { background: linear-gradient(135deg, #a855f7, #ec4899); box-shadow: 0 2px 8px rgba(168,85,247,.45); }
   header.topbar button.logout {
     background: rgba(220,38,38,.15); color: #fca5a5; border: 1px solid rgba(220,38,38,.4);
     padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
@@ -244,8 +208,7 @@
   nav.tabs button {
     background: none; border: none; padding: 16px 22px; cursor: pointer;
     font-size: 14px; font-weight: 700; color: #64748b;
-    border-bottom: 3px solid transparent; font-family: inherit;
-    transition: all .15s;
+    border-bottom: 3px solid transparent; font-family: inherit; transition: all .15s;
   }
   nav.tabs button:hover { color: #1e40af; background: #f8fafc; }
   nav.tabs button.active { color: #1e40af; border-bottom-color: #2563eb; }
@@ -279,10 +242,7 @@
   .btn-edit:hover { background: #fde68a; }
   .btn-secondary { background: #e2e8f0; color: #334155; }
   .btn-secondary:hover { background: #cbd5e1; }
-  .btn-export {
-    background: linear-gradient(135deg, #16a34a, #15803d); color: #fff;
-    box-shadow: 0 4px 12px rgba(22,163,74,.3);
-  }
+  .btn-export { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; box-shadow: 0 4px 12px rgba(22,163,74,.3); }
   .btn-export:hover { box-shadow: 0 6px 18px rgba(22,163,74,.4); }
   .btn-sm { padding: 6px 11px; font-size: 12px; }
   .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
@@ -319,10 +279,7 @@
     background: linear-gradient(90deg, #2563eb, #06b6d4);
     opacity: 0; transition: opacity .2s;
   }
-  .scorecard:hover {
-    border-color: #3b82f6; transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(37,99,235,.18);
-  }
+  .scorecard:hover { border-color: #3b82f6; transform: translateY(-4px); box-shadow: 0 12px 28px rgba(37,99,235,.18); }
   .scorecard:hover::before { opacity: 1; }
   .scorecard .room { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -.5px; }
   .scorecard .sub { font-size: 11px; color: #64748b; margin-top: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: .4px; }
@@ -332,26 +289,15 @@
     display: inline-block; padding: 4px 10px; border-radius: 20px;
   }
 
-  .shift-status {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px;
-  }
+  .shift-status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
   .shift-chip {
     font-size: 10px; font-weight: 800; text-align: center;
     padding: 5px 4px; border-radius: 6px; letter-spacing: .3px;
     border: 1px solid #e2e8f0; background: #f8fafc; color: #94a3b8;
   }
-  .shift-chip.filled {
-    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-    color: #15803d; border-color: #86efac;
-  }
-  .shift-chip.filled.ng {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #b91c1c; border-color: #fca5a5;
-  }
-  .scorecard.full {
-    border-color: #86efac;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  }
+  .shift-chip.filled { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #15803d; border-color: #86efac; }
+  .shift-chip.filled.ng { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #b91c1c; border-color: #fca5a5; }
+  .scorecard.full { border-color: #86efac; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
   .scorecard.full:hover { border-color: #16a34a; }
   .scorecard.full::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
 
@@ -366,13 +312,9 @@
   .dept-info {
     display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
     color: #1e40af; background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    padding: 10px 16px; border-radius: 10px; border: 1px solid #93c5fd;
-    margin-left: auto;
+    padding: 10px 16px; border-radius: 10px; border: 1px solid #93c5fd; margin-left: auto;
   }
-  .dept-info.super {
-    color: #7e22ce; background: linear-gradient(135deg, #fae8ff, #e9d5ff);
-    border-color: #d8b4fe;
-  }
+  .dept-info.super { color: #7e22ce; background: linear-gradient(135deg, #fae8ff, #e9d5ff); border-color: #d8b4fe; }
   .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 22px; }
   .kpi {
     background: #fff; border-radius: 16px; padding: 20px 22px;
@@ -402,8 +344,7 @@
     background: linear-gradient(135deg, #16a34a, #15803d); color: #fff;
     padding: 14px 22px; border-radius: 12px; font-size: 14px; font-weight: 700;
     opacity: 0; transform: translateY(12px); transition: all .3s cubic-bezier(.16,1,.3,1);
-    pointer-events: none; z-index: 2000;
-    box-shadow: 0 12px 30px rgba(22,163,74,.35);
+    pointer-events: none; z-index: 2000; box-shadow: 0 12px 30px rgba(22,163,74,.35);
   }
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.bad { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 12px 30px rgba(220,38,38,.35); }
@@ -423,98 +364,94 @@
   table.matrix td.param-c { font-weight: 600; color: #334155; font-size: 11.5px; }
   table.matrix td.param-c small { display: block; color: #94a3b8; font-weight: 500; font-size: 10px; }
   table.matrix td.shift-c { font-weight: 800; color: #1e40af; font-size: 11.5px; }
-  table.matrix td.val { font-weight: 600; color: #0f172a; min-width: 42px; }
+  table.matrix td.val { font-weight: 600; color: #0f172a; min-width: 42px; position: relative; }
   table.matrix td.val.empty-cell { color: #cbd5e1; font-weight: 400; }
+  
+  /* NG (Belum TMS) */
   table.matrix td.val.ng {
     background: #fee2e2; color: #b91c1c; font-weight: 800;
     box-shadow: inset 0 0 0 1px #fca5a5;
+    cursor: pointer; transition: background .2s;
   }
-  table.matrix td.val.ok { color: #15803d; }
   table.matrix td.val.ng:hover { background: #fecaca; }
-  table.matrix td.val.ok:hover { background: #dcfce7; }
-  table.matrix th.today { background: #dbeafe; color: #1e40af; }
+  
+  /* TMS Selesai (Fixed) */
+  table.matrix td.val.fixed {
+    background: #fef3c7; color: #b45309; font-weight: 800;
+    box-shadow: inset 0 0 0 1px #fcd34d;
+    cursor: pointer; transition: background .2s;
+    position: relative;
+  }
+  table.matrix td.val.fixed::after {
+    content: '✓'; position: absolute; top: 0; right: 2px; font-size: 8px; color: #d97706;
+  }
+  table.matrix td.val.fixed:hover { background: #fde68a; }
+
+  /* Tooltip Kustom */
+  .tooltip-custom {
+    position: absolute; background: #0f172a; color: #fff;
+    padding: 10px; border-radius: 8px; font-size: 11px; z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,.3);
+    pointer-events: none; opacity: 0; transform: translateY(10px); transition: all 0.2s;
+    width: 200px; text-align: left; line-height: 1.5;
+  }
+  .tooltip-custom.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .tooltip-custom img { width: 100%; border-radius: 4px; margin-top: 6px; border: 1px solid #334155; }
+  .tooltip-custom .t-title { font-weight: 800; margin-bottom: 4px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+  .tooltip-custom .t-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .tooltip-custom .t-label { color: #94a3b8; }
+  .tooltip-custom .t-val { font-weight: 700; }
+
   .matrix-legend {
     display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; font-size: 12px;
     color: #64748b; align-items: center; font-weight: 600;
   }
   .matrix-legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
   .matrix-legend .dot.ng { background: #fee2e2; border: 1px solid #fca5a5; }
+  .matrix-legend .dot.fixed { background: #fef3c7; border: 1px solid #fcd34d; }
   .matrix-legend .dot.ok { background: #dcfce7; border: 1px solid #86efac; }
   .matrix-legend .dot.empty { background: #f8fafc; border: 1px solid #e2e8f0; }
 
   /* Chart */
   .chart-section { margin-top: 22px; }
-  .chart-title {
-    font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .chart-title { font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
   .chart-sub { font-size: 11.5px; color: #94a3b8; font-weight: 600; margin-bottom: 14px; }
-  .chart-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 16px;
-  }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
   .chart-card {
     background: linear-gradient(135deg, #ffffff, #f8fafc);
     border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 14px 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,.03);
   }
-  .chart-card .head {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 10px; gap: 10px;
-  }
+  .chart-card .head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
   .chart-card .head .left { min-width: 0; }
   .chart-card .head .pname { font-weight: 800; font-size: 13px; color: #0f172a; }
   .chart-card .head .proom { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
-  .chart-card .head .std {
-    font-size: 10.5px; font-weight: 700; color: #1e40af;
-    background: #dbeafe; border-radius: 5px; padding: 2px 7px; white-space: nowrap;
-  }
-  .chart-card .head .std.ng { background: #fee2e2; color: #b91c1c; }
+  .chart-card .head .std { font-size: 10.5px; font-weight: 700; color: #1e40af; background: #dbeafe; border-radius: 5px; padding: 2px 7px; white-space: nowrap; }
   .chart-card svg { display: block; width: 100%; height: auto; }
 
   /* Modal */
   .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(15,23,42,.55); backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 1000; padding: 20px;
+    position: fixed; inset: 0; background: rgba(15,23,42,.55); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
     animation: fadeIn .15s ease-out;
   }
   .modal-overlay.hidden { display: none; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal {
     background: #fff; border-radius: 20px; width: 100%; max-width: 480px;
-    box-shadow: 0 30px 80px rgba(0,0,0,.4);
-    animation: modalIn .25s cubic-bezier(.16,1,.3,1);
+    box-shadow: 0 30px 80px rgba(0,0,0,.4); animation: modalIn .25s cubic-bezier(.16,1,.3,1);
     max-height: 90vh; display: flex; flex-direction: column;
   }
   .modal.wide { max-width: 640px; }
-  @keyframes modalIn {
-    from { transform: translateY(20px) scale(.96); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
-  }
-  .modal-head {
-    padding: 20px 24px; border-bottom: 1px solid #e2e8f0;
-    font-size: 17px; font-weight: 800; color: #0f172a;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .modal-head .ico {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb, #06b6d4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: #fff;
-  }
+  @keyframes modalIn { from { transform: translateY(20px) scale(.96); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+  .modal-head { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; font-size: 17px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 10px; }
+  .modal-head .ico { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2563eb, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
   .modal-head .h-sub { font-size: 12px; color: #64748b; font-weight: 600; margin-top: 2px; }
-  .modal-body {
-    padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;
-    overflow-y: auto;
-  }
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
   .modal-body .field { min-width: 0; }
-  .modal-foot {
-    padding: 16px 24px; border-top: 1px solid #e2e8f0;
-    display: flex; justify-content: flex-end; gap: 10px;
-  }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
   .modal-msg { font-size: 12.5px; color: #dc2626; min-height: 16px; padding: 0 24px; font-weight: 600; }
+  
   .param-input-row {
     display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
     padding: 12px 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;
@@ -535,24 +472,13 @@
   .shift-opt {
     padding: 14px 10px; border: 2px solid #e2e8f0; border-radius: 10px;
     cursor: pointer; text-align: center; transition: all .15s;
-    background: #fff; font-weight: 700; font-size: 13px; color: #475569;
-    position: relative;
+    background: #fff; font-weight: 700; font-size: 13px; color: #475569; position: relative;
   }
   .shift-opt:hover:not(.disabled) { border-color: #93c5fd; background: #f0f9ff; }
-  .shift-opt.active {
-    border-color: #2563eb; background: linear-gradient(135deg, #eff6ff, #dbeafe);
-    color: #1e40af; box-shadow: 0 4px 12px rgba(37,99,235,.15);
-  }
+  .shift-opt.active { border-color: #2563eb; background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; box-shadow: 0 4px 12px rgba(37,99,235,.15); }
   .shift-opt .big { font-size: 20px; display: block; margin-bottom: 2px; }
-  .shift-opt.disabled {
-    cursor: not-allowed; opacity: .55;
-    background: #f1f5f9; border-color: #e2e8f0;
-  }
-  .shift-opt.disabled::after {
-    content: '✓ TERISI'; position: absolute; top: 4px; right: 4px;
-    font-size: 8.5px; font-weight: 800; background: #16a34a; color: #fff;
-    padding: 2px 5px; border-radius: 4px; letter-spacing: .3px;
-  }
+  .shift-opt.disabled { cursor: not-allowed; opacity: .55; background: #f1f5f9; border-color: #e2e8f0; }
+  .shift-opt.disabled::after { content: '✓ TERISI'; position: absolute; top: 4px; right: 4px; font-size: 8.5px; font-weight: 800; background: #16a34a; color: #fff; padding: 2px 5px; border-radius: 4px; letter-spacing: .3px; }
   .already-note {
     background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
     padding: 10px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600;
@@ -561,11 +487,7 @@
 
   /* Management */
   .room-block { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #fff; }
-  .room-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px; background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    cursor: pointer; transition: background .15s;
-  }
+  .room-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: linear-gradient(135deg, #f8fafc, #f1f5f9); cursor: pointer; transition: background .15s; }
   .room-head:hover { background: #eef2f7; }
   .room-head .left { display: flex; align-items: center; gap: 12px; font-weight: 700; }
   .room-head .right { display: flex; gap: 8px; }
@@ -577,7 +499,6 @@
 </head>
 <body>
 
-<!-- ================= LOGIN PAGE BARU ================= -->
 <div id="loginPage">
   <div class="aurora aurora-1"></div>
   <div class="aurora aurora-2"></div>
@@ -642,29 +563,33 @@
   </div>
 </div>
 
+<!-- Container Tooltip Global -->
+<div id="globalTooltip" class="tooltip-custom"></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================= GENERATE PARTICLES ================= */
+/* ================= GENERATE BUBBLES ================= */
 (function generateParticles() {
   const container = document.getElementById('particles');
   if (!container) return;
-  const count = 30;
+  const count = 40;
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
+    const size = Math.random() * 22 + 8;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
     p.style.left = Math.random() * 100 + '%';
     p.style.animationDelay = Math.random() * 15 + 's';
-    p.style.animationDuration = (10 + Math.random() * 15) + 's';
-    // Variasikan warna berdasarkan index
-    if (i % 3 === 0) p.style.background = 'rgba(6, 182, 212, 0.8)'; // Cyan
-    else if (i % 3 === 1) p.style.background = 'rgba(168, 85, 247, 0.8)'; // Purple
-    p.style.width = (Math.random() * 3 + 2) + 'px';
-    p.style.height = p.style.width;
+    p.style.animationDuration = (15 + Math.random() * 20) + 's';
+    if (i % 3 === 0) p.classList.add('cyan');
+    else if (i % 3 === 1) p.classList.add('purple');
     container.appendChild(p);
   }
 })();
-
+</script>
+<script>
 /* ================= STORAGE ================= */
 const LS = { users:'me_users', rooms:'me_rooms', params:'me_params', records:'me_records', session:'me_session', seq:'me_seq' };
 const memStore = {};
@@ -684,9 +609,7 @@ const SHIFTS = ['SHIFT 1', 'SHIFT 2', 'SHIFT 3'];
 const SHIFT_COUNT = SHIFTS.length;
 const DEPARTMENTS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
 const AREAS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
-
 const CHART_COLORS = ['#2563eb', '#06b6d4', '#16a34a', '#a855f7', '#f59e0b', '#ef4444', '#ec4899', '#0ea5e9'];
-
 const isSuperAdmin = user => user && upper(user.dept) === 'QA';
 
 const todayKey = () => {
@@ -711,7 +634,6 @@ function generateDummyRecords(rooms, params, users) {
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
   const daysInMonth = new Date(year, month, 0).getDate();
-
   const petugasByArea = {};
   users.forEach(u => {
     const d = upper(u.dept);
@@ -726,17 +648,14 @@ function generateDummyRecords(rooms, params, users) {
   rooms.forEach(room => {
     const rParams = params.filter(p => p.roomId === room.id);
     if (!rParams.length) return;
-
     const petugasArr = petugasByArea[upper(room.area)] || users.filter(u => upper(u.dept) !== 'QA');
     const petugas = petugasArr.length ? petugasArr[0] : users[0];
 
     for (let d = 1; d <= daysInMonth; d++) {
       SHIFTS.forEach((sh, si) => {
-        if (Math.random() < 0.08) return; // ~8% slot kosong
-
+        if (Math.random() < 0.08) return;
         const values = [];
         let anyNg = false;
-
         rParams.forEach(p => {
           const minV = Number(p.min), maxV = Number(p.max);
           const range = maxV - minV;
@@ -747,21 +666,16 @@ function generateDummyRecords(rooms, params, users) {
           } else {
             num = minV + range * rnd(0.1, 0.9);
           }
-
           if (range >= 1000) num = Math.round(num);
-          else if (range >= 100) num = Math.round(num * 10) / 10;
           else num = Math.round(num * 10) / 10;
-
           const ok = num >= minV && num <= maxV;
           if (!ok) anyNg = true;
           values.push({ nama: p.nama, satuan: p.satuan, min: p.min, max: p.max, value: num, ok });
         });
-
         const hh = si === 0 ? rndInt(6, 9) : si === 1 ? rndInt(14, 16) : rndInt(21, 23);
         const mm = rndInt(0, 59);
         const ss = rndInt(0, 59);
         const waktu = `${String(d).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}, ${String(hh).padStart(2,'0')}.${String(mm).padStart(2,'0')}.${String(ss).padStart(2,'0')}`;
-
         recs.push({
           id: genId(), no: no++, waktu, shift: sh,
           roomId: room.id, roomNomor: room.nomor, area: room.area,
@@ -771,13 +685,12 @@ function generateDummyRecords(rooms, params, users) {
       });
     }
   });
-
   return { records: recs, nextNo: no };
 }
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v14_anim_login';
+  const marker = 'me_seed_v16_tms';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -883,9 +796,8 @@ function showConfirm(title, message, onYes) {
 }
 function mField(label, id, value, opts = {}) {
   const t = opts.type || 'text';
-  const list = opts.list ? ` list="${opts.list}"` : '';
   return `<div class="field"><label>${esc(label)}</label>
-    <input type="${t}" id="${id}" value="${esc(value)}"${list} ${opts.step ? `step="${opts.step}"` : ''} ${opts.uppercase ? 'style="text-transform:uppercase"' : ''}>
+    <input type="${t}" id="${id}" value="${esc(value)}" ${opts.step ? `step="${opts.step}"` : ''} ${opts.uppercase ? 'style="text-transform:uppercase"' : ''}>
   </div>`;
 }
 
@@ -923,7 +835,6 @@ function enterApp() {
 /* ================= TABS ================= */
 function switchTab(tab) {
   if (tab === 'management' && !isSuperAdmin(session)) tab = 'dashboard';
-
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   ['dashboard', 'input', 'management'].forEach(t => document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab));
   if (tab === 'dashboard') renderDashboard();
@@ -950,10 +861,7 @@ function renderDashboard() {
   const daysInMonth = new Date(year, month, 0).getDate();
   const isCurrentMonth = (now.getFullYear() === year && now.getMonth() + 1 === month);
 
-  const roomsInScope = superAdmin
-    ? getRooms()
-    : getRooms().filter(r => upper(r.area) === myDept);
-
+  const roomsInScope = superAdmin ? getRooms() : getRooms().filter(r => upper(r.area) === myDept);
   const totalParamCount = roomsInScope.reduce((sum, r) => sum + getParamsByRoom(r.id).length, 0);
   const targetTotal = totalParamCount * SHIFT_COUNT * daysInMonth;
 
@@ -985,12 +893,17 @@ function renderDashboard() {
     rec.values.forEach(v => {
       const p = roomParams.find(x => x.nama === v.nama);
       if (!p) return;
-      cellMap[`${rec.roomId}|${p.id}|${shift}|${dateNum}`] = v;
+      
+      // Simpan referensi record dan value ke cellMap
+      cellMap[`${rec.roomId}|${p.id}|${shift}|${dateNum}`] = { rec, valObj: v, param: p };
 
       const ck = `${rec.roomId}|${p.id}`;
       if (!chartData[ck]) chartData[ck] = { room: getRooms().find(rr => rr.id === rec.roomId), param: p, values: {} };
       if (!chartData[ck].values[dateNum]) chartData[ck].values[dateNum] = { sum: 0, count: 0 };
-      chartData[ck].values[dateNum].sum += Number(v.value);
+      
+      // Gunakan nilai after jika sudah ada
+      const finalValue = v.tms && v.tms.after ? v.tms.after.value : v.value;
+      chartData[ck].values[dateNum].sum += Number(finalValue);
       chartData[ck].values[dateNum].count += 1;
     });
   });
@@ -1026,6 +939,7 @@ function renderDashboard() {
       <div style="font-size:14px;font-weight:800;color:#0f172a">Matriks Pemantauan Harian (per Shift) — ${esc(scopeLabel)}</div>
       <div class="matrix-legend">
         <span><span class="dot ng"></span>Di luar standar</span>
+        <span><span class="dot fixed"></span>Sudah TMS</span>
         <span><span class="dot ok"></span>Memenuhi standar</span>
         <span><span class="dot empty"></span>Belum diisi</span>
       </div>
@@ -1034,17 +948,12 @@ function renderDashboard() {
   const rows = [];
   rooms.forEach(room => {
     const rParams = params.filter(p => p.roomId === room.id);
-    if (!rParams.length) {
-      rows.push({ room, param: null, shift: null });
-    } else {
-      rParams.forEach(p => {
-        SHIFTS.forEach(sh => rows.push({ room, param: p, shift: sh }));
-      });
-    }
+    if (!rParams.length) rows.push({ room, param: null, shift: null });
+    else rParams.forEach(p => { SHIFTS.forEach(sh => rows.push({ room, param: p, shift: sh })); });
   });
 
   if (!rooms.length) {
-    html += `<div class="empty">Belum ada ruangan${superAdmin ? '' : ' untuk area ' + esc(myDept)}. Hubungi admin.</div>`;
+    html += `<div class="empty">Belum ada ruangan${superAdmin ? '' : ' untuk area ' + esc(myDept)}.</div>`;
   } else if (!rows.length) {
     html += `<div class="empty">Belum ada parameter${superAdmin ? '' : ' untuk ruangan area ' + esc(myDept)}.</div>`;
   } else {
@@ -1078,13 +987,43 @@ function renderDashboard() {
         html += `<td class="shift-c">${esc(shift)}</td>`;
         for (let d = 1; d <= daysInMonth; d++) {
           const key = `${room.id}|${param.id}|${shift}|${d}`;
-          const cell = cellMap[key];
+          const cellData = cellMap[key];
           const isToday = isCurrentMonth && d === now.getDate();
-          if (!cell) {
+          
+          if (!cellData) {
             html += `<td class="val empty-cell${isToday ? ' today' : ''}">–</td>`;
           } else {
-            const cls = cell.ok ? 'ok' : 'ng';
-            html += `<td class="val ${cls}${isToday ? ' today' : ''}" title="${esc(param.nama)} · ${esc(shift)}: ${esc(cell.value)} ${esc(cell.satuan)}">${esc(cell.value)}</td>`;
+            const { rec, valObj, param } = cellData;
+            let displayVal = valObj.value;
+            let tdClass = valObj.ok ? 'ok' : 'ng';
+            let clickAttr = '';
+            let isTms = false;
+
+            if (valObj.tms) {
+              if (valObj.tms.after) {
+                // TMS Selesai
+                displayVal = valObj.tms.after.value;
+                tdClass = 'fixed';
+                isTms = true;
+              } else {
+                // TMS Before Uploaded (masih nunggu After)
+                tdClass = 'ng'; // Tetap merah, tapi nanti kita kasih border khusus
+              }
+            }
+
+            if (tdClass === 'ng' || tdClass === 'fixed') {
+               clickAttr = `onclick="handleTmsClick('${rec.id}', '${valObj.nama}')"`;
+            }
+
+            // Tooltip
+            let tooltipAttr = '';
+            if (isTms) {
+               tooltipAttr = `onmouseenter="showTmsTooltip(event, '${rec.id}', '${valObj.nama}')" onmouseleave="hideTmsTooltip()"`;
+            }
+
+            html += `<td class="val ${tdClass}${isToday ? ' today' : ''}" ${clickAttr} ${tooltipAttr}>
+              ${esc(displayVal)}
+            </td>`;
           }
         }
       } else {
@@ -1124,10 +1063,121 @@ function renderDashboard() {
       </div>`;
     });
   }
-
   html += `</div></div>`;
 
   document.getElementById('tab-dashboard').innerHTML = html;
+}
+
+/* ================= TOOLTIP TMS ================= */
+function showTmsTooltip(e, recId, paramName) {
+  const rec = getRecords().find(r => r.id === recId);
+  if (!rec) return;
+  const valObj = rec.values.find(v => v.nama === paramName);
+  if (!valObj || !valObj.tms || !valObj.tms.after) return;
+
+  const tooltip = document.getElementById('globalTooltip');
+  const t = valObj.tms;
+
+  let imgHtml = '';
+  if (t.before.photo) imgHtml += `<div style="margin-top:6px"><b>Foto Before:</b><br><img src="${t.before.photo}" alt="Before"></div>`;
+  if (t.after.photo) imgHtml += `<div style="margin-top:6px"><b>Foto After:</b><br><img src="${t.after.photo}" alt="After"></div>`;
+
+  tooltip.innerHTML = `
+    <div class="t-title">Riwayat TMS</div>
+    <div class="t-row"><span class="t-label">Nilai Awal:</span> <span class="t-val" style="color:#fca5a5">${esc(t.before.value)} ${esc(t.before.satuan)}</span></div>
+    <div class="t-row"><span class="t-label">No. WR:</span> <span class="t-val">${esc(t.before.wr)}</span></div>
+    <div class="t-row"><span class="t-label">Tgl TMS:</span> <span class="t-val">${esc(t.before.time)}</span></div>
+    <div class="t-row" style="margin-top:4px;padding-top:4px;border-top:1px dashed #475569"><span class="t-label">Nilai After:</span> <span class="t-val" style="color:#86efac">${esc(t.after.value)} ${esc(t.after.satuan)}</span></div>
+    ${imgHtml}
+  `;
+
+  tooltip.classList.add('show');
+  
+  // Posisi tooltip (di atas cursor)
+  const rect = e.target.getBoundingClientRect();
+  tooltip.style.left = (rect.left + window.scrollX - 70) + 'px';
+  tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 10) + 'px';
+}
+
+function hideTmsTooltip() {
+  document.getElementById('globalTooltip').classList.remove('show');
+}
+
+/* ================= HANDLE KLIK TMS ================= */
+function handleTmsClick(recId, paramName) {
+  const recs = getRecords();
+  const rec = recs.find(r => r.id === recId);
+  if (!rec) return;
+  const valObj = rec.values.find(v => v.nama === paramName);
+  if (!valObj) return;
+
+  if (!valObj.tms) {
+    // STEP 1: Upload Before
+    openModal({
+      title: 'Upload Bukti Before (TMS)',
+      subtitle: `${rec.roomNomor} · ${paramName}`,
+      icon: '📸', wide: true,
+      bodyHTML: `
+        <div class="field"><label>No. WR (Work Request)</label><input id="tms-wr" placeholder="Contoh: WR-2023-001"></div>
+        <div class="field"><label>Upload Foto Bukti (Before)</label><input type="file" id="tms-file-before" accept="image/*"></div>
+        <p style="font-size:12px;color:#dc2626;font-weight:600">Nilai terbaca: ${esc(valObj.value)} ${esc(valObj.satuan)} (MELANGGAR STANDAR)</p>
+      `,
+      okText: 'Simpan & Lanjut After',
+      onOk: () => {
+        const wr = upper(document.getElementById('tms-wr').value);
+        const file = document.getElementById('tms-file-before').files[0];
+        if (!wr) return modalError('No. WR wajib diisi');
+        if (!file) return modalError('Foto Before wajib diupload');
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          valObj.tms = {
+            before: {
+              value: valObj.value, satuan: valObj.satuan, wr: wr,
+              photo: ev.target.result, time: new Date().toLocaleString('id-ID')
+            }
+          };
+          save(LS.records, recs);
+          closeModal();
+          toast('Bukti Before tersimpan. Silakan klik lagi untuk isi After.');
+          renderDashboard();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  } else if (valObj.tms.before && !valObj.tms.after) {
+    // STEP 2: Upload After
+    openModal({
+      title: 'Upload Bukti After (TMS)',
+      subtitle: `${rec.roomNomor} · ${paramName} · WR: ${valObj.tms.before.wr}`,
+      icon: '✅', wide: true,
+      bodyHTML: `
+        <div class="field"><label>Nilai After</label><input type="number" step="any" id="tms-val-after" placeholder="0"></div>
+        <div class="field"><label>Upload Foto Bukti (After)</label><input type="file" id="tms-file-after" accept="image/*"></div>
+        <p style="font-size:12px;color:#16a34a;font-weight:600">Nilai Before: ${esc(valObj.tms.before.value)} ${esc(valObj.tms.before.satuan)}</p>
+      `,
+      okText: 'Simpan After & Selesai',
+      onOk: () => {
+        const valAfter = Number(document.getElementById('tms-val-after').value);
+        const file = document.getElementById('tms-file-after').files[0];
+        if (document.getElementById('tms-val-after').value === '') return modalError('Nilai After wajib diisi');
+        if (!file) return modalError('Foto After wajib diupload');
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          valObj.tms.after = {
+            value: valAfter, satuan: valObj.satuan,
+            photo: ev.target.result, time: new Date().toLocaleString('id-ID')
+          };
+          save(LS.records, recs);
+          closeModal();
+          toast('TMS Selesai! Data matriks telah diperbarui.');
+          renderDashboard();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 }
 
 function renderLineChart(valuesByDay, daysInMonth, param, color) {
@@ -1228,18 +1278,8 @@ function exportExcel() {
  xmlns:x="urn:schemas-microsoft-com:office:excel"
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
  <Styles>
-  <Style ss:ID="Default" ss:Name="Normal">
-   <Alignment ss:Vertical="Bottom"/>
-   <Borders/>
-   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
-   <Interior/>
-   <NumberFormat/>
-   <Protection/>
-  </Style>
-  <Style ss:ID="header">
-   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
-   <Interior ss:Color="#2563EB" ss:Pattern="Solid"/>
-  </Style>
+  <Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Bottom"/><Borders/><Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/><Interior/><NumberFormat/><Protection/></Style>
+  <Style ss:ID="header"><Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#2563EB" ss:Pattern="Solid"/></Style>
  </Styles>
  <Worksheet ss:Name="Pemantauan">
   <Table>
@@ -1254,7 +1294,9 @@ function exportExcel() {
     const d = parseWaktu(r.waktu);
     const tgl = d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
     r.values.forEach(v => {
-      const row = [r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, v.value, v.satuan, v.min, v.max, v.ok?'OK':'NG'];
+      const valToExport = v.tms && v.tms.after ? v.tms.after.value : v.value;
+      const status = v.tms && v.tms.after ? 'FIXED (TMS)' : (v.ok?'OK':'NG');
+      const row = [r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, valToExport, v.satuan, v.min, v.max, status];
       xml += `<Row>`;
       row.forEach(c => {
         const isNum = typeof c === 'number';
@@ -1281,7 +1323,6 @@ function exportExcel() {
     toast(`Export ${recs.length} pemantauan → ${fname}`);
   } catch (e) {
     toast('Download diblok sandbox', true);
-    console.log('XML Excel:\n', xml);
   }
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
 }
