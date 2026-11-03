@@ -703,7 +703,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v22_excel_unit';
+  const marker = 'me_seed_v23_excel_fix2';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -1610,7 +1610,7 @@ function renderManagement() {
       <button class="btn btn-primary" onclick="uploadParamData()">🚀 Upload & Simpan</button>
     </div>
     <p style="font-size:12px; color:#166534; margin-top:10px;">
-      *Download template Excel (.xls), isi data parameter (Spec, Alert, Action, Min, Max), lalu upload. Sistem otomatis parsing format tersebut.
+      *Download template Excel (.xls), isi data parameter, simpan sebagai <b>CSV (Comma Delimited)</b>, lalu upload. Sistem otomatis parsing format tersebut.
     </p>
   </div>`;
 
@@ -2068,9 +2068,13 @@ function uploadParamData() {
   const reader = new FileReader();
   reader.onload = (ev) => {
     try {
-      const text = ev.target.result;
+      let text = ev.target.result;
+      // Bersihkan BOM jika ada
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      
+      // Bersihkan baris kosong
       const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (lines.length < 4) return toast('Format file tidak valid (minimal 4 baris)', true);
+      if (lines.length < 4) return toast('Format file tidak valid (minimal 4 baris data)', true);
 
       // Asumsi baris ke-4 (index 3) adalah data pertama
       const dataLines = lines.slice(3);
@@ -2080,13 +2084,14 @@ function uploadParamData() {
       const params = getParams();
 
       dataLines.forEach(line => {
-        const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-        if (!cols || cols.length < 4) return;
+        // Handle CSV parsing (bisa pakai koma atau tab)
+        const delimiter = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
+        const cols = line.split(delimiter).map(c => c.replace(/^"|"$/g, '').trim());
+        
+        if (!cols || cols.length < 10) return;
 
-        const clean = cols.map(c => c.replace(/^"|"$/g, '').trim());
-
-        const roomNum = upper(clean[0]);
-        const area = upper(clean[1]);
+        const roomNum = upper(cols[0]);
+        const area = upper(cols[1]);
 
         if (!roomNum || !area) { skipped++; return; }
 
@@ -2097,9 +2102,9 @@ function uploadParamData() {
         }
 
         // Offset tiap parameter:
-        // SUHU (kolom index 2-8): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
-        // KELEMBAPAN (kolom index 9-15): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
-        // TEKANAN UDARA (kolom index 16-22): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // SUHU (index 2-8): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // KELEMBAPAN (index 9-15): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // TEKANAN UDARA (index 16-22): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
         const paramDefs = [
           { nama: 'SUHU', offset: 2 },
           { nama: 'KELEMBAPAN', offset: 9 },
@@ -2107,13 +2112,13 @@ function uploadParamData() {
         ];
 
         paramDefs.forEach(def => {
-          const minSpec = Number(clean[def.offset]);
-          const maxSpec = Number(clean[def.offset + 1]);
-          const minAlert = Number(clean[def.offset + 2]);
-          const maxAlert = Number(clean[def.offset + 3]);
-          const minAction = Number(clean[def.offset + 4]);
-          const maxAction = Number(clean[def.offset + 5]);
-          const satuan = clean[def.offset + 6] || '';
+          const minSpec = Number(cols[def.offset]);
+          const maxSpec = Number(cols[def.offset + 1]);
+          const minAlert = Number(cols[def.offset + 2]);
+          const maxAlert = Number(cols[def.offset + 3]);
+          const minAction = Number(cols[def.offset + 4]);
+          const maxAction = Number(cols[def.offset + 5]);
+          const satuan = cols[def.offset + 6] || '';
 
           if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
           
