@@ -703,7 +703,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v23_excel_fix2';
+  const marker = 'me_seed_v24_excel_ultimate';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -2069,26 +2069,41 @@ function uploadParamData() {
   reader.onload = (ev) => {
     try {
       let text = ev.target.result;
-      // Bersihkan BOM jika ada
+      // 1. Bersihkan BOM (Byte Order Mark) jika file disimpan dari Excel
       if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
       
-      // Bersihkan baris kosong
-      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-      if (lines.length < 4) return toast('Format file tidak valid (minimal 4 baris data)', true);
+      // 2. Pecah jadi baris, buang baris yang bener-bener kosong
+      const rawLines = text.split(/\r?\n/);
+      const lines = rawLines.filter(l => l.trim() !== '');
+      
+      // 3. Cari baris pertama yang diawali dengan "R-" atau teks lain (abaikan header)
+      let startIndex = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].toUpperCase().includes('R-') || (!isNaN(parseInt(lines[i][0])) && lines[i].length > 5)) {
+          startIndex = i;
+          break;
+        }
+      }
 
-      // Asumsi baris ke-4 (index 3) adalah data pertama
-      const dataLines = lines.slice(3);
+      if (startIndex >= lines.length) return toast('Tidak ada data valid yang ditemukan di file.', true);
+
+      const dataLines = lines.slice(startIndex);
       let inserted = 0, updated = 0, skipped = 0;
 
       const rooms = getRooms();
       const params = getParams();
 
       dataLines.forEach(line => {
-        // Handle CSV parsing (bisa pakai koma atau tab)
-        const delimiter = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
+        // 4. Deteksi pemisah otomatis (Titik koma, Koma, atau Tab)
+        let delimiter = ',';
+        if (line.includes(';')) delimiter = ';';
+        else if (line.includes('\t')) delimiter = '\t';
+
+        // 5. Pecah kolom
         const cols = line.split(delimiter).map(c => c.replace(/^"|"$/g, '').trim());
         
-        if (!cols || cols.length < 10) return;
+        // Minimal harus ada 9 kolom (Ruangan, Area, 6 batas suhu, Satuan suhu)
+        if (cols.length < 9) return;
 
         const roomNum = upper(cols[0]);
         const area = upper(cols[1]);
@@ -2101,10 +2116,11 @@ function uploadParamData() {
           rooms.push(room);
         }
 
-        // Offset tiap parameter:
-        // SUHU (index 2-8): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
-        // KELEMBAPAN (index 9-15): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
-        // TEKANAN UDARA (index 16-22): Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max, Satuan
+        // 6. Ekstrak data berdasarkan index
+        // Index: 0 (Room), 1 (Area)
+        // SUHU: 2, 3, 4, 5, 6, 7 | Satuan: 8
+        // KELEMBABAN: 9, 10, 11, 12, 13, 14 | Satuan: 15
+        // TEKANAN: 16, 17, 18, 19, 20, 21 | Satuan: 22
         const paramDefs = [
           { nama: 'SUHU', offset: 2 },
           { nama: 'KELEMBAPAN', offset: 9 },
@@ -2120,8 +2136,10 @@ function uploadParamData() {
           const maxAction = Number(cols[def.offset + 5]);
           const satuan = cols[def.offset + 6] || '';
 
+          // Validasi angka
           if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
           
+          // Validasi logika (Min Action <= Alert <= Spec <= Max Spec <= Alert <= Action)
           if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
             console.warn(`Urutan batas salah di ${roomNum} - ${def.nama}`);
             return; 
@@ -2143,11 +2161,16 @@ function uploadParamData() {
 
       save(LS.rooms, rooms);
       save(LS.params, params);
-      toast(`Upload selesai: ${inserted} param ditambah, ${updated} diupdate.`);
+      
+      if (inserted === 0 && updated === 0) {
+        toast('Data tidak valid / kolom tidak sesuai template.', true);
+      } else {
+        toast(`Upload berhasil: ${inserted} ditambah, ${updated} diupdate.`);
+      }
       renderManagement();
     } catch (err) {
       console.error(err);
-      toast('Gagal parsing file. Pastikan format sesuai template.', true);
+      toast('Gagal parsing file. Pastikan format sesuai.', true);
     }
   };
   reader.readAsText(file);
