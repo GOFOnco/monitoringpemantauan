@@ -14,14 +14,12 @@
   }
   .hidden { display: none !important; }
 
-  /* ================= LOGIN PAGE ================= */
+  /* LOGIN PAGE */
   #loginPage {
     display: flex; align-items: center; justify-content: center;
     min-height: 100vh; background: #0f172a;
     position: relative; overflow: hidden; padding: 20px;
   }
-
-  /* Aurora blobs */
   .aurora {
     position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
     animation: float 20s infinite alternate ease-in-out; z-index: 0;
@@ -29,13 +27,11 @@
   .aurora-1 { width: 500px; height: 500px; background: #2563eb; top: -150px; left: -100px; }
   .aurora-2 { width: 400px; height: 400px; background: #06b6d4; bottom: -100px; right: -50px; animation-delay: -5s; animation-duration: 25s; }
   .aurora-3 { width: 300px; height: 300px; background: #a855f7; top: 40%; left: 60%; animation-delay: -10s; animation-duration: 30s; }
-
   @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(50px, 30px) scale(1.1); }
     100% { transform: translate(-30px, -20px) scale(0.9); }
   }
-
   #loginPage::before {
     content: ''; position: absolute; inset: 0;
     background-image:
@@ -46,8 +42,6 @@
     -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
     z-index: 1; pointer-events: none;
   }
-
-  /* Bubbles */
   #particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .particle {
     position: absolute; border-radius: 50%;
@@ -66,7 +60,6 @@
     box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 25px rgba(168, 85, 247, 0.6);
     border-color: rgba(168, 85, 247, 0.4);
   }
-
   @keyframes bubbleFloat {
     0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
     10% { opacity: 0.8; }
@@ -74,8 +67,6 @@
     90% { opacity: 0.8; }
     100% { transform: translate3d(-30px, -110vh, 0) scale(0.9); opacity: 0; }
   }
-
-  /* Login Box */
   .login-box {
     background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     padding: 48px 42px; border-radius: 24px; width: 420px;
@@ -87,7 +78,6 @@
     from { transform: translateY(40px) scale(.95); opacity: 0; }
     to { transform: translateY(0) scale(1); opacity: 1; }
   }
-
   .login-logo {
     width: 72px; height: 72px; border-radius: 20px;
     background: linear-gradient(135deg, #3b82f6, #06b6d4);
@@ -108,7 +98,6 @@
     0% { transform: scale(1); opacity: 0.8; }
     100% { transform: scale(1.5); opacity: 0; }
   }
-
   .login-box h1 {
     font-size: 28px; margin-bottom: 8px;
     background: linear-gradient(135deg, #fff, #93c5fd);
@@ -116,7 +105,6 @@
     font-weight: 800; letter-spacing: -1px;
   }
   .login-box p { font-size: 14px; color: #94a3b8; margin-bottom: 32px; }
-  
   .input-group { position: relative; margin-bottom: 20px; }
   .input-group label {
     position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
@@ -138,9 +126,7 @@
     top: 0; left: 14px; font-size: 11px; color: #60a5fa;
     background: #0f172a; padding: 0 6px; text-transform: uppercase; letter-spacing: 1px;
   }
-
   .err { color: #f87171; font-size: 13px; margin-bottom: 12px; min-height: 18px; font-weight: 600; }
-  
   .btn-main {
     width: 100%; padding: 16px; border: none; border-radius: 12px;
     background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; font-size: 16px; font-weight: 700;
@@ -154,7 +140,6 @@
   .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(37,99,235,.6); }
   .btn-main:hover::before { left: 100%; }
   .btn-main:active { transform: translateY(0); }
-
   .hint {
     margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08);
     font-size: 12.5px; color: #64748b; line-height: 1.8;
@@ -296,7 +281,8 @@
     border: 1px solid #e2e8f0; background: #f8fafc; color: #94a3b8;
   }
   .shift-chip.filled { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #15803d; border-color: #86efac; }
-  .shift-chip.filled.ng { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #b91c1c; border-color: #fca5a5; }
+  .shift-chip.filled.alert { background: linear-gradient(135deg, #fef9c3, #fef08a); color: #a16207; border-color: #fde047; }
+  .shift-chip.filled.action { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #b91c1c; border-color: #fca5a5; }
   .scorecard.full { border-color: #86efac; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
   .scorecard.full:hover { border-color: #16a34a; }
   .scorecard.full::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
@@ -335,6 +321,7 @@
   .kpi .lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .6px; font-weight: 800; margin-top: 4px; }
   .kpi .sub-lbl { font-size: 10.5px; color: #94a3b8; font-weight: 600; margin-top: 3px; }
   .kpi.ok { border-left-color: #16a34a; }
+  .kpi.alert { border-left-color: #eab308; }
   .kpi.ng { border-left-color: #dc2626; }
 
   .badge-area { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: .3px; }
@@ -367,27 +354,29 @@
   table.matrix td.val { font-weight: 600; color: #0f172a; min-width: 42px; position: relative; }
   table.matrix td.val.empty-cell { color: #cbd5e1; font-weight: 400; }
   
-  /* NG (Belum TMS) */
-  table.matrix td.val.ng {
-    background: #fee2e2; color: #b91c1c; font-weight: 800;
-    box-shadow: inset 0 0 0 1px #fca5a5;
-    cursor: pointer; transition: background .2s;
-  }
-  table.matrix td.val.ng:hover { background: #fecaca; }
-  
-  /* TMS Selesai (Fixed) */
-  table.matrix td.val.fixed {
-    background: #fef3c7; color: #b45309; font-weight: 800;
-    box-shadow: inset 0 0 0 1px #fcd34d;
-    cursor: pointer; transition: background .2s;
-    position: relative;
-  }
-  table.matrix td.val.fixed::after {
-    content: '✓'; position: absolute; top: 0; right: 2px; font-size: 8px; color: #d97706;
-  }
-  table.matrix td.val.fixed:hover { background: #fde68a; }
+  /* Status Warna */
+  table.matrix td.val.ok { color: #15803d; }
+  table.matrix td.val.ok:hover { background: #dcfce7; }
 
-  /* Tooltip Kustom */
+  table.matrix td.val.alert {
+    background: #fef9c3; color: #a16207; font-weight: 800;
+    box-shadow: inset 0 0 0 1px #fde047; cursor: pointer; transition: background .2s;
+  }
+  table.matrix td.val.alert:hover { background: #fef08a; }
+
+  table.matrix td.val.action {
+    background: #fee2e2; color: #b91c1c; font-weight: 800;
+    box-shadow: inset 0 0 0 1px #fca5a5; cursor: pointer; transition: background .2s;
+  }
+  table.matrix td.val.action:hover { background: #fecaca; }
+
+  table.matrix td.val.fixed {
+    background: #f0fdf4; color: #15803d; font-weight: 800;
+    box-shadow: inset 0 0 0 1px #86efac; cursor: pointer; transition: background .2s;
+  }
+  table.matrix td.val.fixed::after { content: '✓'; position: absolute; top: 0; right: 2px; font-size: 8px; color: #16a34a; }
+  table.matrix td.val.fixed:hover { background: #dcfce7; }
+
   .tooltip-custom {
     position: absolute; background: #0f172a; color: #fff;
     padding: 10px; border-radius: 8px; font-size: 11px; z-index: 1000;
@@ -408,7 +397,8 @@
   }
   .matrix-legend .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
   .matrix-legend .dot.ng { background: #fee2e2; border: 1px solid #fca5a5; }
-  .matrix-legend .dot.fixed { background: #fef3c7; border: 1px solid #fcd34d; }
+  .matrix-legend .dot.alert { background: #fef9c3; border: 1px solid #fde047; }
+  .matrix-legend .dot.fixed { background: #f0fdf4; border: 1px solid #86efac; }
   .matrix-legend .dot.ok { background: #dcfce7; border: 1px solid #86efac; }
   .matrix-legend .dot.empty { background: #f8fafc; border: 1px solid #e2e8f0; }
 
@@ -427,6 +417,7 @@
   .chart-card .head .pname { font-weight: 800; font-size: 13px; color: #0f172a; }
   .chart-card .head .proom { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
   .chart-card .head .std { font-size: 10.5px; font-weight: 700; color: #1e40af; background: #dbeafe; border-radius: 5px; padding: 2px 7px; white-space: nowrap; }
+  .chart-card .head .std.kosong { background: #fee2e2; color: #b91c1c; }
   .chart-card svg { display: block; width: 100%; height: auto; }
 
   /* Modal */
@@ -495,6 +486,10 @@
   .room-body h4 { font-size: 12px; text-transform: uppercase; color: #475569; margin-bottom: 12px; letter-spacing: .5px; font-weight: 800; }
   .chev { transition: transform .2s; display: inline-block; color: #64748b; font-size: 10px; }
   .chev.open { transform: rotate(90deg); }
+
+  /* Styling spesifik untuk input Min/Max yang banyak (Spec, Alert, Action) */
+  .param-group-title { font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-top: 8px; margin-bottom: 4px; }
+  .param-limits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 </style>
 </head>
 <body>
@@ -563,9 +558,7 @@
   </div>
 </div>
 
-<!-- Container Tooltip Global -->
 <div id="globalTooltip" class="tooltip-custom"></div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -609,7 +602,7 @@ const SHIFTS = ['SHIFT 1', 'SHIFT 2', 'SHIFT 3'];
 const SHIFT_COUNT = SHIFTS.length;
 const DEPARTMENTS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
 const AREAS = ['QC', 'LOGISTIC', 'PRODUKSI', 'QA'];
-const CHART_COLORS = ['#2563eb', '#06b6d4', '#16a34a', '#a855f7', '#f59e0b', '#ef4444', '#ec4899', '#0ea5e9'];
+const CHART_COLORS = ['#2563eb', '#06b6d4', '#16a34a', '#a855f7', '#f59e0b', '#ef4444', '#ec4899', '#0ea5e9', '#8b5cf6'];
 const isSuperAdmin = user => user && upper(user.dept) === 'QA';
 
 const todayKey = () => {
@@ -624,6 +617,18 @@ const parseWaktu = str => {
     return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
   } catch { return null; }
 };
+
+/* Helper Cek Status (Spec / Alert / Action) */
+function checkStatus(val, p) {
+  const minSpec = Number(p.min_spec), maxSpec = Number(p.max_spec);
+  const minAlert = Number(p.min_alert), maxAlert = Number(p.max_alert);
+  const minAction = Number(p.min_action), maxAction = Number(p.max_action);
+
+  if (val >= minSpec && val <= maxSpec) return 'OK'; // Masuk Spec
+  if (val >= minAlert && val <= maxAlert) return 'ALERT'; // Masuk Alert
+  if (val >= minAction && val <= maxAction) return 'ACTION'; // Masuk Action
+  return 'ACTION'; // Di luar semua batas dianggap Action
+}
 
 /* ================= DUMMY DATA GENERATOR ================= */
 function rnd(min, max) { return Math.random() * (max - min) + min; }
@@ -655,22 +660,30 @@ function generateDummyRecords(rooms, params, users) {
       SHIFTS.forEach((sh, si) => {
         if (Math.random() < 0.08) return;
         const values = [];
-        let anyNg = false;
+        let anyNg = false, anyAlert = false;
         rParams.forEach(p => {
-          const minV = Number(p.min), maxV = Number(p.max);
+          // Dummy generation logic based on Action Min/Max
+          const minV = Number(p.min_action), maxV = Number(p.max_action);
           const range = maxV - minV;
           let num;
-          if (Math.random() < 0.15) {
-            if (Math.random() < 0.5) num = minV - range * rnd(0.02, 0.15);
-            else num = maxV + range * rnd(0.02, 0.15);
-          } else {
-            num = minV + range * rnd(0.1, 0.9);
+          const r = Math.random();
+          if (r < 0.1) { // Action
+             num = Math.random() < 0.5 ? minV - range * rnd(0.1, 0.2) : maxV + range * rnd(0.1, 0.2);
+          } else if (r < 0.25) { // Alert
+             num = Math.random() < 0.5 ? Number(p.min_alert) - range * rnd(0.05, 0.1) : Number(p.max_alert) + range * rnd(0.05, 0.1);
+          } else { // Spec
+             const minS = Number(p.min_spec), maxS = Number(p.max_spec);
+             num = minS + (maxS - minS) * rnd(0.1, 0.9);
           }
+
           if (range >= 1000) num = Math.round(num);
           else num = Math.round(num * 10) / 10;
-          const ok = num >= minV && num <= maxV;
-          if (!ok) anyNg = true;
-          values.push({ nama: p.nama, satuan: p.satuan, min: p.min, max: p.max, value: num, ok });
+
+          const status = checkStatus(num, p);
+          if (status === 'ACTION') anyNg = true;
+          if (status === 'ALERT') anyAlert = true;
+
+          values.push({ nama: p.nama, satuan: p.satuan, value: num, status: status });
         });
         const hh = si === 0 ? rndInt(6, 9) : si === 1 ? rndInt(14, 16) : rndInt(21, 23);
         const mm = rndInt(0, 59);
@@ -680,7 +693,7 @@ function generateDummyRecords(rooms, params, users) {
           id: genId(), no: no++, waktu, shift: sh,
           roomId: room.id, roomNomor: room.nomor, area: room.area,
           nik: petugas.nik, inisial: petugas.inisial, dept: petugas.dept,
-          values, status: anyNg ? 'NG' : 'OK'
+          values, status: anyNg ? 'ACTION' : anyAlert ? 'ALERT' : 'OK'
         });
       });
     }
@@ -690,7 +703,7 @@ function generateDummyRecords(rooms, params, users) {
 
 /* ================= SEED ================= */
 function seed(force) {
-  const marker = 'me_seed_v16_tms';
+  const marker = 'me_seed_v20_upload_excel';
   if (!force && storage.getItem(marker)) return;
   [LS.users, LS.rooms, LS.params, LS.records, LS.seq, LS.session].forEach(k => storage.removeItem(k));
 
@@ -712,15 +725,16 @@ function seed(force) {
   ];
   save(LS.rooms, rooms);
 
+  // Struktur Param: min_spec, max_spec, min_alert, max_alert, min_action, max_action
   const params = [
-    { id: genId(), roomId: roomQC1, nama: 'SUHU', satuan: '°C', min: 18, max: 26 },
-    { id: genId(), roomId: roomQC1, nama: 'KELEMBAPAN', satuan: '%', min: 40, max: 60 },
-    { id: genId(), roomId: roomQC2, nama: 'SUHU', satuan: '°C', min: 20, max: 25 },
-    { id: genId(), roomId: roomLOG, nama: 'SUHU', satuan: '°C', min: 15, max: 30 },
-    { id: genId(), roomId: roomLOG, nama: 'KELEMBAPAN', satuan: '%', min: 30, max: 70 },
-    { id: genId(), roomId: roomPRD1, nama: 'SUHU', satuan: '°C', min: 20, max: 28 },
-    { id: genId(), roomId: roomPRD1, nama: 'TEKANAN UDARA', satuan: 'PA', min: 100000, max: 102000 },
-    { id: genId(), roomId: roomPRD2, nama: 'SUHU', satuan: '°C', min: 22, max: 30 }
+    { id: genId(), roomId: roomQC1, nama: 'SUHU', satuan: '°C', min_spec: 20, max_spec: 24, min_alert: 18, max_alert: 26, min_action: 15, max_action: 30 },
+    { id: genId(), roomId: roomQC1, nama: 'KELEMBAPAN', satuan: '%', min_spec: 45, max_spec: 55, min_alert: 40, max_alert: 60, min_action: 30, max_action: 70 },
+    { id: genId(), roomId: roomQC2, nama: 'SUHU', satuan: '°C', min_spec: 20, max_spec: 24, min_alert: 18, max_alert: 26, min_action: 15, max_action: 30 },
+    { id: genId(), roomId: roomLOG, nama: 'SUHU', satuan: '°C', min_spec: 20, max_spec: 26, min_alert: 15, max_alert: 30, min_action: 10, max_action: 35 },
+    { id: genId(), roomId: roomLOG, nama: 'KELEMBAPAN', satuan: '%', min_spec: 40, max_spec: 60, min_alert: 30, max_alert: 70, min_action: 20, max_action: 80 },
+    { id: genId(), roomId: roomPRD1, nama: 'SUHU', satuan: '°C', min_spec: 22, max_spec: 26, min_alert: 20, max_alert: 28, min_action: 15, max_action: 32 },
+    { id: genId(), roomId: roomPRD1, nama: 'TEKANAN UDARA', satuan: 'PA', min_spec: 100500, max_spec: 101500, min_alert: 100000, max_alert: 102000, min_action: 99000, max_action: 103000 },
+    { id: genId(), roomId: roomPRD2, nama: 'SUHU', satuan: '°C', min_spec: 22, max_spec: 26, min_alert: 20, max_alert: 28, min_action: 15, max_action: 32 }
   ];
   save(LS.params, params);
 
@@ -875,7 +889,8 @@ function renderDashboard() {
 
   const filledCount = monthRecs.length;
   const okCount = monthRecs.filter(r => r.status === 'OK').length;
-  const ngCount = filledCount - okCount;
+  const alertCount = monthRecs.filter(r => r.status === 'ALERT').length;
+  const actionCount = monthRecs.filter(r => r.status === 'ACTION').length;
   const pct = targetTotal > 0 ? Math.round((filledCount / targetTotal) * 100) : 0;
 
   const rooms = roomsInScope;
@@ -894,14 +909,12 @@ function renderDashboard() {
       const p = roomParams.find(x => x.nama === v.nama);
       if (!p) return;
       
-      // Simpan referensi record dan value ke cellMap
       cellMap[`${rec.roomId}|${p.id}|${shift}|${dateNum}`] = { rec, valObj: v, param: p };
 
       const ck = `${rec.roomId}|${p.id}`;
       if (!chartData[ck]) chartData[ck] = { room: getRooms().find(rr => rr.id === rec.roomId), param: p, values: {} };
       if (!chartData[ck].values[dateNum]) chartData[ck].values[dateNum] = { sum: 0, count: 0 };
       
-      // Gunakan nilai after jika sudah ada
       const finalValue = v.tms && v.tms.after ? v.tms.after.value : v.value;
       chartData[ck].values[dateNum].sum += Number(finalValue);
       chartData[ck].values[dateNum].count += 1;
@@ -930,17 +943,18 @@ function renderDashboard() {
       <div class="lbl">Total Pemantauan</div>
       <div class="sub-lbl">${pct}% · ${totalParamCount} parameter × ${SHIFT_COUNT} shift × ${daysInMonth} hari · ${esc(scopeLabel)}</div>
     </div>
-    <div class="kpi ok"><div class="num">${okCount}</div><div class="lbl">Status OK</div><div class="sub-lbl">dari ${filledCount} terisi</div></div>
-    <div class="kpi ng"><div class="num">${ngCount}</div><div class="lbl">Status NG</div><div class="sub-lbl">di luar standar</div></div>
+    <div class="kpi ok"><div class="num">${okCount}</div><div class="lbl">Status Spec</div><div class="sub-lbl">dari ${filledCount} terisi</div></div>
+    <div class="kpi alert"><div class="num">${alertCount}</div><div class="lbl">Status Alert</div><div class="sub-lbl">perlu perhatian</div></div>
+    <div class="kpi ng"><div class="num">${actionCount}</div><div class="lbl">Status Action</div><div class="sub-lbl">butuh tindakan</div></div>
   </div>`;
 
   html += `<div class="card" style="padding:18px 18px 14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div style="font-size:14px;font-weight:800;color:#0f172a">Matriks Pemantauan Harian (per Shift) — ${esc(scopeLabel)}</div>
       <div class="matrix-legend">
-        <span><span class="dot ng"></span>Di luar standar</span>
-        <span><span class="dot fixed"></span>Sudah TMS</span>
-        <span><span class="dot ok"></span>Memenuhi standar</span>
+        <span><span class="dot ok"></span>Spec (Aman)</span>
+        <span><span class="dot alert"></span>Alert (Kuning)</span>
+        <span><span class="dot ng"></span>Action (Merah)</span>
         <span><span class="dot empty"></span>Belum diisi</span>
       </div>
     </div>`;
@@ -981,7 +995,7 @@ function renderDashboard() {
       }
       if (param) {
         if (param.id !== prevParamId) {
-          html += `<td class="param-c" rowspan="${SHIFTS.length}">${esc(param.nama)}<small>${esc(param.min)}–${esc(param.max)} ${esc(param.satuan)}</small></td>`;
+          html += `<td class="param-c" rowspan="${SHIFTS.length}">${esc(param.nama)}<small>Spec: ${esc(param.min_spec)}–${esc(param.max_spec)} ${esc(param.satuan)}</small></td>`;
           prevParamId = param.id;
         }
         html += `<td class="shift-c">${esc(shift)}</td>`;
@@ -995,27 +1009,26 @@ function renderDashboard() {
           } else {
             const { rec, valObj, param } = cellData;
             let displayVal = valObj.value;
-            let tdClass = valObj.ok ? 'ok' : 'ng';
+            let tdClass = valObj.status === 'OK' ? 'ok' : (valObj.status === 'ALERT' ? 'alert' : 'action');
             let clickAttr = '';
             let isTms = false;
 
             if (valObj.tms) {
               if (valObj.tms.after) {
-                // TMS Selesai
                 displayVal = valObj.tms.after.value;
                 tdClass = 'fixed';
                 isTms = true;
               } else {
-                // TMS Before Uploaded (masih nunggu After)
-                tdClass = 'ng'; // Tetap merah, tapi nanti kita kasih border khusus
+                // Masih butuh After, warnanya tetap sesuai status aslinya
+                tdClass = valObj.status === 'OK' ? 'ok' : (valObj.status === 'ALERT' ? 'alert' : 'action');
               }
             }
 
-            if (tdClass === 'ng' || tdClass === 'fixed') {
+            // Klik hanya untuk Alert / Action
+            if (tdClass === 'alert' || tdClass === 'action' || tdClass === 'fixed') {
                clickAttr = `onclick="handleTmsClick('${rec.id}', '${valObj.nama}')"`;
             }
 
-            // Tooltip
             let tooltipAttr = '';
             if (isTms) {
                tooltipAttr = `onmouseenter="showTmsTooltip(event, '${rec.id}', '${valObj.nama}')" onmouseleave="hideTmsTooltip()"`;
@@ -1040,26 +1053,40 @@ function renderDashboard() {
   /* CHART */
   html += `<div class="card chart-section">
     <div class="chart-title">📈 Grafik Rata-rata Harian per Parameter</div>
-    <div class="chart-sub">Sumbu X = tanggal ${MONTH_NAMES[month-1]} ${year}. Nilai = rata-rata semua shift pada tanggal tersebut. Area hijau = rentang standar.</div>
+    <div class="chart-sub">Sumbu X = tanggal ${MONTH_NAMES[month-1]} ${year}. Nilai = rata-rata semua shift pada tanggal tersebut. Area hijau = rentang Spec.</div>
     <div class="chart-grid">`;
 
-  const chartKeys = Object.keys(chartData);
-  if (!chartKeys.length) {
-    html += `<div class="empty" style="grid-column: 1/-1">Belum ada data untuk grafik di bulan ini.</div>`;
+  const allChartKeys = [];
+  rooms.forEach(room => {
+    const rParams = params.filter(p => p.roomId === room.id);
+    rParams.forEach(p => {
+      allChartKeys.push({ room, param: p });
+    });
+  });
+
+  if (!allChartKeys.length) {
+    html += `<div class="empty" style="grid-column: 1/-1">Belum ada parameter untuk digambar.</div>`;
   } else {
-    chartKeys.forEach((ck, idx) => {
+    allChartKeys.forEach((item, idx) => {
+      const { room, param } = item;
+      const ck = `${room.id}|${param.id}`;
       const cd = chartData[ck];
-      if (!cd || !cd.room || !cd.param) return;
+      
       const color = CHART_COLORS[idx % CHART_COLORS.length];
+      const isEmpty = !cd || !cd.values || Object.keys(cd.values).length === 0;
+      
       html += `<div class="chart-card">
         <div class="head">
           <div class="left">
-            <div class="pname">${esc(cd.param.nama)}</div>
-            <div class="proom">${esc(cd.room.nomor)} · ${esc(cd.room.area)}</div>
+            <div class="pname">${esc(param.nama)}</div>
+            <div class="proom">${esc(room.nomor)} · ${esc(room.area)}</div>
           </div>
-          <div class="std">${esc(cd.param.min)}–${esc(cd.param.max)} ${esc(cd.param.satuan)}</div>
+          ${isEmpty 
+            ? `<div class="std kosong">BELUM DIISI</div>` 
+            : `<div class="std">Spec: ${esc(param.min_spec)}–${esc(param.max_spec)} ${esc(param.satuan)}</div>`
+          }
         </div>
-        ${renderLineChart(cd.values, daysInMonth, cd.param, color)}
+        ${renderLineChart(cd ? cd.values : {}, daysInMonth, param, color, isEmpty)}
       </div>`;
     });
   }
@@ -1092,13 +1119,10 @@ function showTmsTooltip(e, recId, paramName) {
   `;
 
   tooltip.classList.add('show');
-  
-  // Posisi tooltip (di atas cursor)
   const rect = e.target.getBoundingClientRect();
   tooltip.style.left = (rect.left + window.scrollX - 70) + 'px';
   tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 10) + 'px';
 }
-
 function hideTmsTooltip() {
   document.getElementById('globalTooltip').classList.remove('show');
 }
@@ -1110,17 +1134,19 @@ function handleTmsClick(recId, paramName) {
   if (!rec) return;
   const valObj = rec.values.find(v => v.nama === paramName);
   if (!valObj) return;
+  
+  // Hanya izinkan klik jika statusnya ALERT atau ACTION
+  if (valObj.status === 'OK' && !valObj.tms) return;
 
   if (!valObj.tms) {
-    // STEP 1: Upload Before
     openModal({
       title: 'Upload Bukti Before (TMS)',
-      subtitle: `${rec.roomNomor} · ${paramName}`,
+      subtitle: `${rec.roomNomor} · ${paramName} · Status: ${valObj.status}`,
       icon: '📸', wide: true,
       bodyHTML: `
         <div class="field"><label>No. WR (Work Request)</label><input id="tms-wr" placeholder="Contoh: WR-2023-001"></div>
         <div class="field"><label>Upload Foto Bukti (Before)</label><input type="file" id="tms-file-before" accept="image/*"></div>
-        <p style="font-size:12px;color:#dc2626;font-weight:600">Nilai terbaca: ${esc(valObj.value)} ${esc(valObj.satuan)} (MELANGGAR STANDAR)</p>
+        <p style="font-size:12px;color:#dc2626;font-weight:600">Nilai terbaca: ${esc(valObj.value)} ${esc(valObj.satuan)} (DI LUAR SPEC)</p>
       `,
       okText: 'Simpan & Lanjut After',
       onOk: () => {
@@ -1146,7 +1172,6 @@ function handleTmsClick(recId, paramName) {
       }
     });
   } else if (valObj.tms.before && !valObj.tms.after) {
-    // STEP 2: Upload After
     openModal({
       title: 'Upload Bukti After (TMS)',
       subtitle: `${rec.roomNomor} · ${paramName} · WR: ${valObj.tms.before.wr}`,
@@ -1180,11 +1205,20 @@ function handleTmsClick(recId, paramName) {
   }
 }
 
-function renderLineChart(valuesByDay, daysInMonth, param, color) {
+/* ================= RENDER GRAFIK ================= */
+function renderLineChart(valuesByDay, daysInMonth, param, color, isEmpty = false) {
   const W = 360, H = 160;
   const padL = 34, padR = 10, padT = 12, padB = 22;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
+
+  if (isEmpty) {
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+      <rect x="0" y="0" width="${W}" height="${H}" fill="#f8fafc" rx="8"/>
+      <line x1="${padL}" y1="${H/2}" x2="${W-padR}" y2="${H/2}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="${W/2}" y="${H/2 - 6}" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="700">Belum ada data pengisian</text>
+    </svg>`;
+  }
 
   const pts = [];
   for (let d = 1; d <= daysInMonth; d++) {
@@ -1192,7 +1226,7 @@ function renderLineChart(valuesByDay, daysInMonth, param, color) {
     if (v && v.count > 0) pts.push({ day: d, val: v.sum / v.count });
   }
 
-  const minStd = Number(param.min), maxStd = Number(param.max);
+  const minStd = Number(param.min_spec), maxStd = Number(param.max_spec);
   let minY = minStd, maxY = maxStd;
   pts.forEach(p => { if (p.val < minY) minY = p.val; if (p.val > maxY) maxY = p.val; });
   if (minY === maxY) { minY -= 1; maxY += 1; }
@@ -1257,7 +1291,7 @@ function buildMonthOptions(selYear, selMonth) {
   return opts.join('');
 }
 
-/* ================= EXPORT EXCEL (XML Spreadsheet 2003) ================= */
+/* ================= EXPORT EXCEL ================= */
 function exportExcel() {
   if (!isSuperAdmin(session)) return;
   const [yStr, mStr] = (window.__dashMonth || '').split('-');
@@ -1269,7 +1303,7 @@ function exportExcel() {
 
   if (!recs.length) return toast('Tidak ada data untuk diekspor di bulan ini', true);
 
-  const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Min','Max','Status'];
+  const header = ['No','Tanggal','Waktu','Shift','Ruangan','Area','NIK','Petugas','Departemen','Parameter','Nilai','Satuan','Spec Min','Spec Max','Status'];
   
   let xml = `<?xml version="1.0"?>
 <?mso-application progid="Excel.Sheet"?>
@@ -1293,10 +1327,14 @@ function exportExcel() {
   recs.slice().sort((a, b) => a.no - b.no).forEach(r => {
     const d = parseWaktu(r.waktu);
     const tgl = d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '';
+    const roomParams = getParams().filter(p => p.roomId === r.roomId);
+    
     r.values.forEach(v => {
       const valToExport = v.tms && v.tms.after ? v.tms.after.value : v.value;
-      const status = v.tms && v.tms.after ? 'FIXED (TMS)' : (v.ok?'OK':'NG');
-      const row = [r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, valToExport, v.satuan, v.min, v.max, status];
+      const status = v.tms && v.tms.after ? 'FIXED (TMS)' : v.status;
+      const p = roomParams.find(x => x.nama === v.nama);
+      
+      const row = [r.no, tgl, r.waktu||'', r.shift||'', r.roomNomor, r.area, r.nik, r.inisial, r.dept, v.nama, valToExport, v.satuan, p ? p.min_spec : '', p ? p.max_spec : '', status];
       xml += `<Row>`;
       row.forEach(c => {
         const isNum = typeof c === 'number';
@@ -1353,7 +1391,7 @@ function renderInput() {
       const pcount = getParamsByRoom(r.id).length;
       const shiftStatus = SHIFTS.map(sh => {
         const rec = getSlotRecord(r.id, sh, tk);
-        return { shift: sh, filled: !!rec, ng: rec ? rec.status === 'NG' : false };
+        return { shift: sh, filled: !!rec, status: rec ? rec.status : '' };
       });
       const filledCount = shiftStatus.filter(s => s.filled).length;
       const isFull = filledCount === SHIFTS.length;
@@ -1362,7 +1400,7 @@ function renderInput() {
         <div class="sub">${esc(r.area)}</div>
         <div class="pcount">${pcount} parameter · ${filledCount}/3 shift terisi</div>
         <div class="shift-status">
-          ${shiftStatus.map(s => `<div class="shift-chip ${s.filled ? 'filled' : ''} ${s.ng ? 'ng' : ''}">
+          ${shiftStatus.map(s => `<div class="shift-chip ${s.filled ? 'filled' : ''} ${s.status === 'ALERT' ? 'alert' : s.status === 'ACTION' ? 'action' : ''}">
             ${s.shift.split(' ')[1]}${s.filled ? ' ✓' : ''}
           </div>`).join('')}
         </div>
@@ -1416,7 +1454,12 @@ function openInputForm(roomId) {
       if (v === '') { row.classList.remove('invalid'); return; }
       const num = Number(v);
       if (Number.isNaN(num)) { row.classList.add('invalid'); return; }
-      row.classList.toggle('invalid', !(num >= Number(p.min) && num <= Number(p.max)));
+      
+      const stat = checkStatus(num, p);
+      // Warnai border input sesuai status
+      if (stat === 'ACTION') input.style.borderColor = '#fca5a5'; // Merah
+      else if (stat === 'ALERT') input.style.borderColor = '#fde047'; // Kuning
+      else input.style.borderColor = '#86efac'; // Hijau
     });
   });
 }
@@ -1443,9 +1486,9 @@ function renderInputPopup() {
     <div class="param-input-row" id="row-${p.id}">
       <div class="pinfo">
         <b>${esc(p.nama)}</b> <span style="color:#64748b">(${esc(p.satuan)})</span>
-        <span class="std">Standar: ${esc(p.min)} – ${esc(p.max)} ${esc(p.satuan)}</span>
+        <span class="std">Spec: ${esc(p.min_spec)}–${esc(p.max_spec)} | Alert: ${esc(p.min_alert)}–${esc(p.max_alert)} | Action: ${esc(p.min_action)}–${esc(p.max_action)}</span>
       </div>
-      <input type="number" step="any" id="val-${p.id}" placeholder="0" inputmode="decimal">
+      <input type="number" step="any" id="val-${p.id}" placeholder="0" inputmode="decimal" style="transition: border-color .3s;">
     </div>
   `).join('');
 
@@ -1478,7 +1521,7 @@ function submitInput() {
   }
 
   const values = [];
-  let allFilled = true, invalid = false, anyNg = false;
+  let allFilled = true, invalid = false, anyAction = false, anyAlert = false;
 
   for (const p of params) {
     const el = document.getElementById('val-' + p.id);
@@ -1486,9 +1529,12 @@ function submitInput() {
     if (raw === '') { allFilled = false; continue; }
     const num = Number(raw);
     if (Number.isNaN(num)) { invalid = true; continue; }
-    const ok = num >= Number(p.min) && num <= Number(p.max);
-    if (!ok) anyNg = true;
-    values.push({ nama: p.nama, satuan: p.satuan, min: p.min, max: p.max, value: num, ok });
+    
+    const stat = checkStatus(num, p);
+    if (stat === 'ACTION') anyAction = true;
+    if (stat === 'ALERT') anyAlert = true;
+
+    values.push({ nama: p.nama, satuan: p.satuan, value: num, status: stat });
   }
 
   if (!allFilled || invalid || !values.length) {
@@ -1504,7 +1550,7 @@ function submitInput() {
     shift: currentShift,
     roomId: room.id, roomNomor: room.nomor, area: room.area,
     nik: session.nik, inisial: session.inisial, dept: session.dept,
-    values, status: anyNg ? 'NG' : 'OK'
+    values, status: anyAction ? 'ACTION' : anyAlert ? 'ALERT' : 'OK'
   });
   save(LS.records, recs);
   save(LS.seq, { no: seq.no + 1 });
@@ -1552,6 +1598,21 @@ function renderManagement() {
   const params = getParams();
 
   let html = `<h2 class="page-title">⚙️ Management <span class="sub">— Super Admin (QA)</span></h2>`;
+
+  // === UPLOAD PARAMETER SECTION ===
+  html += `<div class="card" style="background: #f0fdf4; border-color: #86efac;">
+    <h3 style="font-size:15px;margin-bottom:14px;font-weight:800;color:#15803d">📥 Upload Master Data Parameter (Excel/CSV)</h3>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+      <button class="btn btn-export" onclick="downloadTemplateParam()">⬇️ Download Template Excel</button>
+      <div class="field" style="flex:1; min-width:200px; margin:0;">
+        <input type="file" id="uploadParamFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="padding:8px; border:1px solid #86efac; background:#fff;">
+      </div>
+      <button class="btn btn-primary" onclick="uploadParamData()">🚀 Upload & Simpan</button>
+    </div>
+    <p style="font-size:12px; color:#166534; margin-top:10px;">
+      *Download template, isi sesuai format, simpan sebagai CSV, lalu upload. Sistem akan otomatis mendeteksi kolom (Ruangan, Area, Satuan, Parameter, dll).
+    </p>
+  </div>`;
 
   html += `<div class="card">
     <h3 style="font-size:15px;margin-bottom:14px;font-weight:800">👥 Manajemen User</h3>
@@ -1607,22 +1668,51 @@ function renderManagement() {
         </div>
         <div class="room-body ${isOpen ? '' : 'hidden'}">
           <h4>Parameter Ruangan ${esc(r.nomor)}</h4>
-          <div class="form-row">
-            <div class="field"><label>Nama</label><input id="p-nama-${r.id}" placeholder="NAMA" style="text-transform:uppercase"></div>
-            <div class="field"><label>Satuan</label>
-              <input id="p-satuan-${r.id}" list="satuanList-${r.id}" placeholder="SATUAN">
-              <datalist id="satuanList-${r.id}"><option value="°C"><option value="%"><option value="PA"></datalist>
+          
+          <!-- FORM TAMBAH PARAMETER BARU -->
+          <div class="card" style="background:#f8fafc; border:1px solid #e2e8f0; margin-bottom:16px; padding:14px;">
+            <div style="font-size:12px; font-weight:800; margin-bottom:10px;">Tambah Parameter Baru</div>
+            <div class="form-row" style="margin-bottom:8px;">
+              <div class="field"><label>Nama</label><input id="p-nama-${r.id}" placeholder="NAMA" style="text-transform:uppercase"></div>
+              <div class="field"><label>Satuan</label>
+                <input id="p-satuan-${r.id}" list="satuanList-${r.id}" placeholder="SATUAN">
+                <datalist id="satuanList-${r.id}"><option value="°C"><option value="%"><option value="PA"></datalist>
+              </div>
             </div>
-            <div class="field" style="max-width:110px"><label>Min</label><input type="number" step="any" id="p-min-${r.id}" placeholder="0"></div>
-            <div class="field" style="max-width:110px"><label>Max</label><input type="number" step="any" id="p-max-${r.id}" placeholder="0"></div>
-            <div class="field" style="flex:0"><button class="btn btn-primary" onclick="addParam('${r.id}')">+ Tambah</button></div>
+            <div class="param-limits-grid">
+              <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
+                <label style="color:#16a34a">SPEC (Hijau)</label>
+                <div style="display:flex; gap:8px;">
+                   <input type="number" step="any" id="p-min-spec-${r.id}" placeholder="Min Spec" style="flex:1">
+                   <input type="number" step="any" id="p-max-spec-${r.id}" placeholder="Max Spec" style="flex:1">
+                </div>
+              </div>
+              <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
+                <label style="color:#eab308">ALERT (Kuning)</label>
+                <div style="display:flex; gap:8px;">
+                   <input type="number" step="any" id="p-min-alert-${r.id}" placeholder="Min Alert" style="flex:1">
+                   <input type="number" step="any" id="p-max-alert-${r.id}" placeholder="Max Alert" style="flex:1">
+                </div>
+              </div>
+              <div class="field" style="grid-column: span 2;">
+                <label style="color:#dc2626">ACTION (Merah)</label>
+                <div style="display:flex; gap:8px;">
+                   <input type="number" step="any" id="p-min-action-${r.id}" placeholder="Min Action" style="flex:1">
+                   <input type="number" step="any" id="p-max-action-${r.id}" placeholder="Max Action" style="flex:1">
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:12px; width:100%;" onclick="addParam('${r.id}')">+ Tambah Parameter</button>
           </div>
-          <table style="margin-top:12px"><thead><tr><th>Nama</th><th>Satuan</th><th>Min</th><th>Max</th><th>Syarat</th><th>Aksi</th></tr></thead><tbody>`;
+
+          <table style="margin-top:12px"><thead><tr><th>Nama</th><th>Satuan</th><th>Spec</th><th>Alert</th><th>Action</th><th>Aksi</th></tr></thead><tbody>`;
       if (!rParams.length) html += `<tr><td colspan="6" class="empty">Belum ada parameter</td></tr>`;
       rParams.forEach(p => {
         html += `<tr>
-          <td><b>${esc(p.nama)}</b></td><td>${esc(p.satuan)}</td><td>${esc(p.min)}</td><td>${esc(p.max)}</td>
-          <td>${esc(p.min)} – ${esc(p.max)} ${esc(p.satuan)}</td>
+          <td><b>${esc(p.nama)}</b></td><td>${esc(p.satuan)}</td>
+          <td style="color:#16a34a; font-size:12px;">${esc(p.min_spec)} - ${esc(p.max_spec)}</td>
+          <td style="color:#a16207; font-size:12px;">${esc(p.min_alert)} - ${esc(p.max_alert)}</td>
+          <td style="color:#dc2626; font-size:12px;">${esc(p.min_action)} - ${esc(p.max_action)}</td>
           <td><button class="btn btn-edit btn-sm" onclick="editParam('${p.id}')">Edit</button>
               <button class="btn btn-danger btn-sm" onclick="delParam('${p.id}')">Delete</button></td></tr>`;
       });
@@ -1721,43 +1811,90 @@ function delRoom(id) {
 function addParam(roomId) {
   const nama = upper(document.getElementById('p-nama-' + roomId).value);
   const satuan = document.getElementById('p-satuan-' + roomId).value.trim();
-  const min = document.getElementById('p-min-' + roomId).value;
-  const max = document.getElementById('p-max-' + roomId).value;
+  const minSpec = Number(document.getElementById('p-min-spec-' + roomId).value);
+  const maxSpec = Number(document.getElementById('p-max-spec-' + roomId).value);
+  const minAlert = Number(document.getElementById('p-min-alert-' + roomId).value);
+  const maxAlert = Number(document.getElementById('p-max-alert-' + roomId).value);
+  const minAction = Number(document.getElementById('p-min-action-' + roomId).value);
+  const maxAction = Number(document.getElementById('p-max-action-' + roomId).value);
+
   if (!nama || !satuan) return toast('Nama & satuan wajib diisi', true);
-  if (min === '' || max === '') return toast('Min & max wajib diisi', true);
-  if (Number(min) > Number(max)) return toast('Min tidak boleh lebih besar dari Max', true);
+  if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) {
+    return toast('Semua batas Min/Max Spec, Alert, Action wajib diisi angka', true);
+  }
+  
+  // Validasi urutan: Action < Alert < Spec < Spec < Alert < Action
+  if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
+    return toast('Urutan batas salah! Harus: Min Action <= Min Alert <= Min Spec <= Max Spec <= Max Alert <= Max Action', true);
+  }
+
   const params = getParams();
   if (params.some(p => p.roomId === roomId && upper(p.nama) === nama))
     return toast('Nama parameter sudah ada di ruangan ini', true);
-  params.push({ id: genId(), roomId, nama, satuan, min: Number(min), max: Number(max) });
+  
+  params.push({ id: genId(), roomId, nama, satuan, min_spec: minSpec, max_spec: maxSpec, min_alert: minAlert, max_alert: maxAlert, min_action: minAction, max_action: maxAction });
   save(LS.params, params); toast('Parameter ditambahkan'); renderManagement();
 }
+
 function editParam(id) {
   const params = getParams();
   const p = params.find(x => x.id === id); if (!p) return;
   openModal({
-    title: 'Edit Parameter', icon: '📐',
+    title: 'Edit Parameter', icon: '📐', wide: true,
     bodyHTML: mField('Nama Parameter', 'm-p-nama', p.nama, { uppercase: true })
       + `<div class="field"><label>Satuan</label>
           <input id="m-p-satuan" value="${esc(p.satuan)}" list="m-satuanList">
           <datalist id="m-satuanList"><option value="°C"><option value="%"><option value="PA"></datalist></div>`
-      + `<div style="display:flex;gap:12px">
-          ${mField('Min', 'm-p-min', p.min, { type: 'number', step: 'any' })}
-          ${mField('Max', 'm-p-max', p.max, { type: 'number', step: 'any' })}
+      + `<div class="param-limits-grid" style="margin-top:10px;">
+          <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
+            <label style="color:#16a34a">SPEC (Hijau)</label>
+            <div style="display:flex; gap:8px;">
+               ${mField('Min Spec', 'm-p-min-spec', p.min_spec, { type: 'number', step: 'any' })}
+               ${mField('Max Spec', 'm-p-max-spec', p.max_spec, { type: 'number', step: 'any' })}
+            </div>
+          </div>
+          <div class="field" style="grid-column: span 2; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:4px;">
+            <label style="color:#eab308">ALERT (Kuning)</label>
+            <div style="display:flex; gap:8px;">
+               ${mField('Min Alert', 'm-p-min-alert', p.min_alert, { type: 'number', step: 'any' })}
+               ${mField('Max Alert', 'm-p-max-alert', p.max_alert, { type: 'number', step: 'any' })}
+            </div>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label style="color:#dc2626">ACTION (Merah)</label>
+            <div style="display:flex; gap:8px;">
+               ${mField('Min Action', 'm-p-min-action', p.min_action, { type: 'number', step: 'any' })}
+               ${mField('Max Action', 'm-p-max-action', p.max_action, { type: 'number', step: 'any' })}
+            </div>
+          </div>
         </div>`,
     okText: 'Simpan',
     onOk: () => {
       const nama = upper(document.getElementById('m-p-nama').value);
       const satuan = document.getElementById('m-p-satuan').value.trim();
-      const min = Number(document.getElementById('m-p-min').value);
-      const max = Number(document.getElementById('m-p-max').value);
+      const minSpec = Number(document.getElementById('m-p-min-spec').value);
+      const maxSpec = Number(document.getElementById('m-p-max-spec').value);
+      const minAlert = Number(document.getElementById('m-p-min-alert').value);
+      const maxAlert = Number(document.getElementById('m-p-max-alert').value);
+      const minAction = Number(document.getElementById('m-p-min-action').value);
+      const maxAction = Number(document.getElementById('m-p-max-action').value);
+
       if (!nama) return modalError('Nama tidak boleh kosong');
       if (!satuan) return modalError('Satuan tidak boleh kosong');
-      if (Number.isNaN(min) || Number.isNaN(max)) return modalError('Min/Max harus angka');
-      if (min > max) return modalError('Min tidak boleh lebih besar dari Max');
+      if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return modalError('Semua batas wajib angka');
+      
+      if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
+        return modalError('Urutan batas salah! Harus: Action < Alert < Spec < Spec < Alert < Action');
+      }
+
       if (params.some(x => x.id !== id && x.roomId === p.roomId && upper(x.nama) === nama))
         return modalError('Nama parameter sudah ada di ruangan ini');
-      p.nama = nama; p.satuan = satuan; p.min = min; p.max = max;
+        
+      p.nama = nama; p.satuan = satuan; 
+      p.min_spec = minSpec; p.max_spec = maxSpec;
+      p.min_alert = minAlert; p.max_alert = maxAlert;
+      p.min_action = minAction; p.max_action = maxAction;
+      
       save(LS.params, params); closeModal(); toast('Parameter diperbarui'); renderManagement();
     }
   });
@@ -1767,6 +1904,128 @@ function delParam(id) {
     save(LS.params, getParams().filter(p => p.id !== id));
     toast('Parameter dihapus'); renderManagement();
   });
+}
+
+/* ================= UPLOAD / DOWNLOAD TEMPLATE EXCEL ================= */
+function downloadTemplateParam() {
+  const header1 = ['Nomor Ruangan', 'Area', 'Satuan', 'Suhu', '', '', '', '', '', '', 'Kelembaban', '', '', '', '', '', '', 'Tekanan Udara', '', '', '', '', '', ''];
+  const header2 = ['', '', '', 'Spec', '', 'Alert', '', 'Action', '', '', 'Spec', '', 'Alert', '', 'Action', '', '', 'Spec', '', 'Alert', '', 'Action', '', ''];
+  const header3 = ['', '', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', '', 'Min', 'Max', 'Min', 'Max', 'Min', 'Max', ''];
+
+  // Contoh baris data
+  const example = ['R-101', 'QC', '°C', '20', '24', '18', '26', '15', '30', '%', '45', '55', '40', '60', '30', '70', 'PA', '100500', '101500', '100000', '102000', '99000', '103000', ''];
+
+  const csvContent = [header1, header2, header3, example]
+    .map(row => row.map(c => `"${c}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'template_parameter.csv';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+}
+
+function uploadParamData() {
+  const fileInput = document.getElementById('uploadParamFile');
+  if (!fileInput.files || !fileInput.files[0]) return toast('Pilih file CSV terlebih dahulu', true);
+  
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const text = ev.target.result;
+      const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (lines.length < 4) return toast('Format file tidak valid (minimal 4 baris)', true);
+
+      // Asumsi baris ke-4 (index 3) adalah data (karena index 0,1,2 adalah header)
+      // Kita loop mulai index 3 untuk membaca baris data
+      const dataLines = lines.slice(3);
+      let inserted = 0, updated = 0, skipped = 0;
+
+      const rooms = getRooms();
+      const params = getParams();
+
+      dataLines.forEach(line => {
+        // Parse CSV sederhana (abaikan quote complex)
+        const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        if (!cols || cols.length < 4) return;
+
+        // Bersihkan tanda kutip
+        const clean = cols.map(c => c.replace(/^"|"$/g, '').trim());
+
+        const roomNum = upper(clean[0]);
+        const area = upper(clean[1]);
+        const satuan = clean[2];
+
+        if (!roomNum || !area) { skipped++; return; }
+
+        // Cari atau buat Room
+        let room = rooms.find(r => upper(r.nomor) === roomNum);
+        if (!room) {
+          room = { id: genId(), nomor: roomNum, area: area };
+          rooms.push(room);
+        }
+
+        // Ekstrak data parameter dari kolom
+        // Mulai dari index 3, setiap parameter pakai 8 kolom (Spec Min, Spec Max, Alert Min, Alert Max, Action Min, Action Max) -> 6 angka, tapi di file lu formatnya:
+        // Nama Param | Spec Min | Spec Max | Alert Min | Alert Max | Action Min | Action Max
+        // Contoh: Suhu | 20 | 24 | 18 | 26 | 15 | 30
+        // Kita harus deteksi nama param dari header row (baris 1).
+        // Biar gampang, kita hardcode param yang mungkin ada.
+        
+        const paramDefs = [
+          { nama: 'SUHU', offset: 3 },
+          { nama: 'KELEMBABAN', offset: 11 }, // 3 + 8 = 11
+          { nama: 'TEKANAN UDARA', offset: 19 } // 11 + 8 = 19
+        ];
+
+        paramDefs.forEach(def => {
+          const minSpec = Number(clean[def.offset]);
+          const maxSpec = Number(clean[def.offset + 1]);
+          const minAlert = Number(clean[def.offset + 2]);
+          const maxAlert = Number(clean[def.offset + 3]);
+          const minAction = Number(clean[def.offset + 4]);
+          const maxAction = Number(clean[def.offset + 5]);
+
+          // Skip jika kosong
+          if (isNaN(minSpec) || isNaN(maxSpec) || isNaN(minAlert) || isNaN(maxAlert) || isNaN(minAction) || isNaN(maxAction)) return;
+          
+          // Validasi urutan
+          if (!(minAction <= minAlert && minAlert <= minSpec && minSpec <= maxSpec && maxSpec <= maxAlert && maxAlert <= maxAction)) {
+            console.warn(`Urutan batas salah di ${roomNum} - ${def.nama}`);
+            return; 
+          }
+
+          // Simpan param
+          let p = params.find(x => x.roomId === room.id && x.nama === def.nama);
+          if (p) {
+            p.satuan = satuan;
+            p.min_spec = minSpec; p.max_spec = maxSpec;
+            p.min_alert = minAlert; p.max_alert = maxAlert;
+            p.min_action = minAction; p.max_action = maxAction;
+            updated++;
+          } else {
+            params.push({ id: genId(), roomId: room.id, nama: def.nama, satuan, min_spec: minSpec, max_spec: maxSpec, min_alert: minAlert, max_alert: maxAlert, min_action: minAction, max_action: maxAction });
+            inserted++;
+          }
+        });
+      });
+
+      save(LS.rooms, rooms);
+      save(LS.params, params);
+      toast(`Upload selesai: ${inserted} param ditambah, ${updated} diupdate.`);
+      renderManagement();
+    } catch (err) {
+      console.error(err);
+      toast('Gagal parsing file. Pastikan format sesuai template.', true);
+    }
+  };
+  reader.readAsText(file);
 }
 
 document.getElementById('loginNik').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
